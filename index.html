@@ -1,0 +1,2551 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#142D59" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="UniSync" />
+  <title>UniSync</title>
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="./icon.svg" />
+  <link rel="apple-touch-icon" href="./icon.svg" />
+  <style>
+    :root {
+      --bg: #EAF1FA;
+      --surface: #F3F6FC;
+      --surface-alt: #DCE9F8;
+      --primary: #2456A6;
+      --primary-deep: #142D59;
+      --accent: #3986D9;
+      --soft: #83B8EB;
+      --border: #C5D5EA;
+      --text: #142D59;
+      --text-sec: #526783;
+      --on-primary: #F8FAFE;
+      --danger: #B3261E;
+      --cat-general: #4E6A85;
+      --cat-math: #6A4CAF;
+      --cat-core: #2456A6;
+      --cat-grad: #0E3A5D;
+      --font-scale: 1;
+      --radius: 14px;
+      --shadow: 0 2px 10px rgba(20, 45, 89, 0.08);
+    }
+    body.dark {
+      --bg: #0B1730;
+      --surface: #142D59;
+      --surface-alt: #1B386B;
+      --primary: #3986D9;
+      --primary-deep: #0B1730;
+      --accent: #83B8EB;
+      --soft: #3986D9;
+      --border: #284D8C;
+      --text: #EAF1FA;
+      --text-sec: #ACC6E8;
+      --shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+    }
+    body.role-instructor {
+      --bg: #EAE6F5;
+      --surface: #F3F0FA;
+      --surface-alt: #DED7F1;
+      --primary: #44317E;
+      --primary-deep: #21183F;
+      --accent: #7056B3;
+      --soft: #A18BD5;
+      --border: #CFC5E5;
+      --text: #21183F;
+      --text-sec: #655B7C;
+      --shadow: 0 2px 10px rgba(33, 24, 63, 0.09);
+    }
+    body.role-instructor.dark {
+      --bg: #151126;
+      --surface: #21183F;
+      --surface-alt: #2C2154;
+      --primary: #A18BD5;
+      --primary-deep: #151126;
+      --accent: #A18BD5;
+      --soft: #7056B3;
+      --border: #433378;
+      --text: #F3F0FA;
+      --text-sec: #C8BBE8;
+      --on-primary: #151126;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Plus Jakarta Sans", Arial, sans-serif;
+      font-size: calc(14px * var(--font-scale));
+      line-height: 1.45;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+    button, input, select, textarea {
+      font: inherit;
+      color: inherit;
+    }
+    .hidden { display: none !important; }
+    .container { max-width: 1080px; margin: 0 auto; padding: 14px 16px 84px; }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      box-shadow: var(--shadow);
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      min-height: 42px;
+      padding: 8px 14px;
+      border-radius: 12px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.92rem;
+      transition: transform 0.12s ease, opacity 0.15s ease, background 0.15s ease;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary { background: var(--primary); color: var(--on-primary); }
+    .btn-outline { background: var(--surface); color: var(--text); border-color: var(--border); }
+    .btn-soft { background: var(--surface-alt); color: var(--text); border-color: var(--border); }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-sm { min-height: 34px; padding: 5px 10px; font-size: 0.82rem; border-radius: 10px; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .pill.active {
+      background: var(--primary);
+      color: var(--on-primary);
+      border-color: var(--primary);
+    }
+    .input, .select, .textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 11px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      outline: none;
+    }
+    .input:focus, .select:focus, .textarea:focus { border-color: var(--primary); }
+    .row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .between { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+    .muted { color: var(--text-sec); font-size: 0.86rem; }
+
+    /* Entry / Auth Screen */
+    .auth-wrap {
+      min-height: 100vh;
+      padding: max(14px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: linear-gradient(180deg, var(--bg) 0%, var(--surface-alt) 50%, var(--bg) 100%);
+    }
+    .auth-topbar {
+      width: 100%;
+      max-width: 540px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .brand-logo {
+      width: 68px;
+      height: 68px;
+      border-radius: 19px;
+      box-shadow: var(--shadow);
+      object-fit: cover;
+    }
+    .auth-card {
+      width: 100%;
+      max-width: 500px;
+      padding: 20px;
+      border-radius: 20px;
+    }
+    .role-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px 0 18px; }
+    .role-tile {
+      padding: 13px;
+      border-radius: 14px;
+      border: 1.5px solid var(--border);
+      background: var(--bg);
+      cursor: pointer;
+      text-align: start;
+    }
+    .role-tile.active {
+      border-color: var(--primary);
+      background: var(--surface-alt);
+      box-shadow: 0 0 0 1px var(--primary);
+    }
+
+    /* Workspace Shell */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: max(10px, env(safe-area-inset-top)) 14px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .avatar-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      background: var(--surface-alt);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      overflow: hidden;
+      padding: 0;
+    }
+    .avatar-btn img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* Bottom Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 30;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-around;
+      padding: 6px 4px max(8px, env(safe-area-inset-bottom));
+    }
+    .nav-tab {
+      flex: 1;
+      border: none;
+      background: transparent;
+      color: var(--text-sec);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      padding: 6px 4px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      cursor: pointer;
+      min-height: 44px;
+    }
+    .nav-tab.active { color: var(--primary); }
+
+    /* Side Drawer (Navigation + Account & Settings) */
+    .drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      background: rgba(10, 18, 36, 0.45);
+      display: flex;
+    }
+    .drawer-panel {
+      width: min(336px, 88vw);
+      height: 100%;
+      background: var(--surface);
+      border-inline-end: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.28);
+    }
+    .drawer-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px 16px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .drawer-nav-item {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 12px;
+      border-radius: 12px;
+      border: none;
+      background: transparent;
+      text-align: start;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .drawer-nav-item.active {
+      background: var(--surface-alt);
+      color: var(--primary);
+    }
+
+    /* Visual Roadmap Canvas (strictly LTR math inside even when Arabic RTL) */
+    .roadmap-viewport {
+      position: relative;
+      width: 100%;
+      height: 440px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      touch-action: none;
+      direction: ltr;
+      user-select: none;
+    }
+    .roadmap-board {
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform-origin: 0 0;
+    }
+    .roadmap-node {
+      position: absolute;
+      width: 184px;
+      height: 104px;
+      border-radius: 10px;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      overflow: hidden;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+      text-align: left;
+    }
+    .roadmap-node-head {
+      padding: 4px 8px;
+      color: #F8FAFE;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .roadmap-node-body {
+      padding: 6px 8px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .roadmap-node-title {
+      font-size: 11.5px;
+      font-weight: 600;
+      line-height: 1.25;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .roadmap-stage-pill {
+      position: absolute;
+      width: 184px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--surface-alt);
+      color: var(--text);
+      font-size: 11.5px;
+      font-weight: 700;
+      text-align: center;
+      border: 1px solid var(--border);
+    }
+
+    /* Priority Badges (Strictly Blue / Royal Purple / Crimson / Slate) */
+    .prio-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 9px;
+      border-radius: 999px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: #F8FAFE;
+    }
+    .prio-CRITICAL { background: #9E2A3B; }
+    .prio-HIGH { background: #44317E; }
+    .prio-NORMAL { background: #2456A6; }
+    .prio-LOW { background: #526783; }
+
+    /* Modal Dialog */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      background: rgba(10, 18, 36, 0.52);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-card {
+      width: 100%;
+      max-width: 500px;
+      max-height: 86vh;
+      overflow-y: auto;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 18px 42px rgba(0,0,0,0.32);
+    }
+
+    /* Pomodoro Companion Bounce */
+    @keyframes floatBob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+    .companion-bob { animation: floatBob 2.6s ease-in-out infinite; }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+
+  <script>
+  (() => {
+    'use strict';
+
+    // Preserved Microsoft Entra ID Client ID
+    const MICROSOFT_ENTRA_CLIENT_ID = '8326f723-eb8a-4288-b346-9614eb8608c3';
+    const STORAGE_KEY = 'unisync_pwa_state_v1';
+
+    // 20 Languages with RTL flags and clean translations
+    const LANGUAGES = [
+      { code: 'en', native: 'English', en: 'English', rtl: false },
+      { code: 'ar', native: 'العربية', en: 'Arabic', rtl: true },
+      { code: 'fr', native: 'Français', en: 'French', rtl: false },
+      { code: 'es', native: 'Español', en: 'Spanish', rtl: false },
+      { code: 'ur', native: 'اردو', en: 'Urdu', rtl: true },
+      { code: 'tr', native: 'Türkçe', en: 'Turkish', rtl: false },
+      { code: 'de', native: 'Deutsch', en: 'German', rtl: false },
+      { code: 'id', native: 'Bahasa Indonesia', en: 'Indonesian', rtl: false },
+      { code: 'ms', native: 'Bahasa Melayu', en: 'Malay', rtl: false },
+      { code: 'fa', native: 'فارسی', en: 'Persian', rtl: true },
+      { code: 'hi', native: 'हिन्दी', en: 'Hindi', rtl: false },
+      { code: 'bn', native: 'বাংলা', en: 'Bengali', rtl: false },
+      { code: 'ru', native: 'Русский', en: 'Russian', rtl: false },
+      { code: 'zh', native: '中文', en: 'Chinese', rtl: false },
+      { code: 'ja', native: '日本語', en: 'Japanese', rtl: false },
+      { code: 'ko', native: '한국어', en: 'Korean', rtl: false },
+      { code: 'pt', native: 'Português', en: 'Portuguese', rtl: false },
+      { code: 'it', native: 'Italiano', en: 'Italian', rtl: false },
+      { code: 'sw', native: 'Kiswahili', en: 'Swahili', rtl: false },
+      { code: 'tl', native: 'Tagalog', en: 'Tagalog', rtl: false }
+    ];
+
+    const STRINGS_EN = {
+      welcomeSubtitle: 'Focused AOU Academic Workspace',
+      chooseRole: 'Choose Your Role',
+      studentRole: 'Student',
+      studentRoleSub: 'Roadmaps · Pomodoro · Study Hub',
+      instructorRole: 'Instructor',
+      instructorRoleSub: 'Smart Triage · Materials · Chat',
+      signInGoogle: 'Sign in with Google',
+      signInMicrosoft: 'Connect Microsoft / Outlook',
+      tryDemo: 'Instant Demo Account',
+      support: 'Support',
+      language: 'Language',
+      getApps: 'Install App (iOS · Android · Windows · macOS)',
+      navMenu: 'Navigation',
+      accountSettings: 'Account & Settings',
+      home: 'Home',
+      inbox: 'Inbox',
+      pomodoro: 'Pomodoro',
+      calendar: 'Calendar',
+      chat: 'Chat',
+      studyHub: 'Study Hub',
+      roadmaps: 'Study Plan',
+      gpaCalc: 'GPA Calc',
+      portals: 'AOU Portals',
+      smartInbox: 'Smart Inbox',
+      materials: 'Materials',
+      chatEmail: 'Chat & Email',
+      aouPrefix: 'Arab Open University',
+      branch: 'AOU Branch',
+      major: 'Major',
+      darkMode: 'Dark Mode',
+      fontSize: 'Font Size',
+      fontCompact: 'Compact',
+      fontLarge: 'Large',
+      fontXLarge: 'Extra Large',
+      profilePhoto: 'Profile Photo',
+      tapPhoto: 'Tap to upload photo (saved locally)',
+      dataProtection: 'Data Protection: Notes, schedules, roadmaps & attachments stay safely stored in local device storage.',
+      signOut: 'Sign Out',
+      nextUp: 'Next Up',
+      addEvent: 'Add Event',
+      addAlarm: 'Smart Alarm',
+      testAlarm: 'Test Alarm',
+      focusMode: 'Focus Mode',
+      startFocus: 'Start Focus',
+      pause: 'Pause',
+      reset: 'Reset',
+      focusLocked: 'Focus lock active until timer ends',
+      girlComp: 'Female Companion',
+      boyComp: 'Male Companion',
+      roadmapTitle: 'AOU Study Plan Roadmap',
+      zoom: 'Zoom',
+      stage: 'Stage',
+      prereq: 'Prerequisites',
+      unlocks: 'Unlocks Courses',
+      noPrereq: 'Foundation Course (No Prerequisites)',
+      courseStatus: 'Course Status',
+      statusCompleted: 'Completed',
+      statusInProgress: 'In Progress',
+      statusNextTerm: 'Next Term',
+      statusNotStarted: 'Not Started Yet',
+      catGeneral: 'General / Univ.',
+      catMath: 'Math / Stats',
+      catCore: 'Major / Core',
+      catGrad: 'Graduation',
+      credits: 'Cr',
+      gpaTitle: 'AOU SIS GPA Calculator',
+      semGpa: 'Semester GPA',
+      cumGpa: 'Cumulative GPA',
+      priorRecord: 'Prior Cumulative Record (Optional)',
+      priorGpa: 'Prior GPA (0.00–4.00)',
+      priorCredits: 'Prior Credits',
+      addCourse: 'Add Course',
+      courseCodePh: 'Course Code (e.g. M251)',
+      creditHours: 'Credit Hours',
+      gradeLabel: 'SIS Grade (Max A)',
+      clearAll: 'Clear All',
+      portalsTitle: 'AOU Branch Portals (SIS · LMS)',
+      supportTitle: 'AOU Technical Support Directory',
+      open: 'Open',
+      close: 'Close',
+      done: 'Done',
+      all: 'All',
+      compose: 'Compose',
+      send: 'Send',
+      attach: 'Attach File / Image',
+      bookAssistant: 'Book-Only Study Assistant',
+      bookHint: 'Answers strictly from your added books & notes inside UniSync.',
+      addBook: 'Add Book / Notes',
+      askBook: 'Ask from your books...',
+      flashcards: 'Flashcards',
+      mindMap: 'Mind Map',
+      forum: 'Freshmen Forum',
+      voiceNotes: 'Voice Notes',
+      repeatedQ: 'Repeated Student Questions',
+      groupBtn: 'Group Repeated Questions',
+      unifiedReply: 'Unified Reply to All',
+      publishMat: 'Publish Material',
+      ringtone: 'Ringtone'
+    };
+
+    const STRINGS_AR = {
+      welcomeSubtitle: 'مساحة أكاديمية ذكية موحدة',
+      chooseRole: 'اختر دورك الأكاديمي',
+      studentRole: 'طالب',
+      studentRoleSub: 'الخطط · بومودورو · مركز الدراسة',
+      instructorRole: 'عضو هيئة تدريس',
+      instructorRoleSub: 'الفرز الذكي · المحاضرات · المحادثة',
+      signInGoogle: 'تسجيل الدخول عبر Google',
+      signInMicrosoft: 'ربط حساب Microsoft / Outlook',
+      tryDemo: 'حساب تجريبي فوري',
+      support: 'الدعم',
+      language: 'اللغة',
+      getApps: 'تحميل التطبيق (iOS · Android · Windows · macOS)',
+      navMenu: 'القائمة',
+      accountSettings: 'الحساب والإعدادات',
+      home: 'الرئيسية',
+      inbox: 'البريد',
+      pomodoro: 'بومودورو',
+      calendar: 'التقويم',
+      chat: 'المحادثات',
+      studyHub: 'مركز الدراسة',
+      roadmaps: 'الخطة الدراسية',
+      gpaCalc: 'حاسبة المعدل',
+      portals: 'بوابات الجامعة',
+      smartInbox: 'البريد الذكي',
+      materials: 'المحاضرات',
+      chatEmail: 'المحادثة والبريد',
+      aouPrefix: 'الجامعة العربية المفتوحة',
+      branch: 'فرع الجامعة',
+      major: 'التخصص',
+      darkMode: 'الوضع الداكن',
+      fontSize: 'حجم الخط',
+      fontCompact: 'مدمج',
+      fontLarge: 'كبير',
+      fontXLarge: 'كبير جداً',
+      profilePhoto: 'الصورة الشخصية',
+      tapPhoto: 'اضغط لرفع صورة (تحفظ محلياً)',
+      dataProtection: 'حماية البيانات: ملاحظاتك وجداولك وخططك ومرفقاتك محمية داخل تخزين الجهاز المحلي.',
+      signOut: 'تسجيل الخروج',
+      nextUp: 'القادم الآن',
+      addEvent: 'إضافة حدث',
+      addAlarm: 'منبه ذكي',
+      testAlarm: 'تجربة التنبيه',
+      focusMode: 'وضع التركيز',
+      startFocus: 'ابدأ التركيز',
+      pause: 'إيقاف مؤقت',
+      reset: 'إعادة ضبط',
+      focusLocked: 'قفل التركيز مفعل حتى انتهاء المؤقت',
+      girlComp: 'رفيقة الدراسة',
+      boyComp: 'رفيق الدراسة',
+      roadmapTitle: 'الخطة الدراسية التفاعلية',
+      zoom: 'التكبير',
+      stage: 'المستوى',
+      prereq: 'المتطلبات السابقة',
+      unlocks: 'المواد التي تفتحها',
+      noPrereq: 'مادة تأسيسية (بدون متطلب سابق)',
+      courseStatus: 'حالة المادة',
+      statusCompleted: 'مكتملة',
+      statusInProgress: 'قيد الدراسة',
+      statusNextTerm: 'الترم القادم',
+      statusNotStarted: 'لم تبدأ بعد',
+      catGeneral: 'متطلبات عامة',
+      catMath: 'رياضيات وإحصاء',
+      catCore: 'مواد التخصص',
+      catGrad: 'مشروع التخرج',
+      credits: 'س',
+      gpaTitle: 'حاسبة المعدل (نظام SIS)',
+      semGpa: 'المعدل الفصلي',
+      cumGpa: 'المعدل التراكمي',
+      priorRecord: 'السجل التراكمي السابق (اختياري)',
+      priorGpa: 'المعدل السابق (0.00–4.00)',
+      priorCredits: 'الساعات المجتازة',
+      addCourse: 'إضافة مادة',
+      courseCodePh: 'رمز المادة (مثل M251)',
+      creditHours: 'الساعات المعتمدة',
+      gradeLabel: 'التقدير (الأعلى A)',
+      clearAll: 'مسح الكل',
+      portalsTitle: 'بوابات الجامعة (SIS · LMS)',
+      supportTitle: 'دليل الدعم الفني للجامعة',
+      open: 'فتح',
+      close: 'إغلاق',
+      done: 'تم',
+      all: 'الكل',
+      compose: 'رسالة جديدة',
+      send: 'إرسال',
+      attach: 'إرفاق ملف / صورة',
+      bookAssistant: 'مساعد الدراسة من الكتب فقط',
+      bookHint: 'يجيب حصرياً من كتبك وملاحظاتك المرفوعة داخل UniSync.',
+      addBook: 'إضافة كتاب / ملخص',
+      askBook: 'اسأل من كتبك المرفوعة...',
+      flashcards: 'بطاقات المراجعة',
+      mindMap: 'خريطة ذهنية',
+      forum: 'منتدى المستجدين',
+      voiceNotes: 'ملاحظات صوتية',
+      repeatedQ: 'الأسئلة المتكررة للطلبة',
+      groupBtn: 'تجميع الأسئلة المتكررة',
+      unifiedReply: 'رد موحد للجميع',
+      publishMat: 'نشر مادة علمية',
+      ringtone: 'نغمة التنبيه'
+    };
+
+    const EXTRA_LANGS = {
+      fr: {
+        welcomeSubtitle: 'Espace académique AOU unifié', chooseRole: 'Choisir votre rôle', studentRole: 'Étudiant',
+        instructorRole: 'Enseignant', support: 'Support', language: 'Langue', navMenu: 'Menu',
+        accountSettings: 'Compte et Paramètres', roadmaps: 'Plan d’études', gpaCalc: 'Calcul GPA',
+        portals: 'Portails AOU', darkMode: 'Mode sombre', signOut: 'Déconnexion',
+        catGeneral: 'Général / Univ.', catMath: 'Maths / Stats', catCore: 'Spécialité', catGrad: 'Projet de fin'
+      },
+      es: {
+        welcomeSubtitle: 'Espacio académico AOU unificado', chooseRole: 'Elige tu rol', studentRole: 'Estudiante',
+        instructorRole: 'Docente', support: 'Soporte', language: 'Idioma', navMenu: 'Menú',
+        accountSettings: 'Cuenta y Ajustes', roadmaps: 'Plan de Estudios', gpaCalc: 'Cálculo GPA',
+        portals: 'Portales AOU', darkMode: 'Modo oscuro', signOut: 'Cerrar sesión',
+        catGeneral: 'General / Univ.', catMath: 'Matemáticas', catCore: 'Especialidad', catGrad: 'Graduación'
+      },
+      ur: {
+        welcomeSubtitle: 'عرب اوپن یونیورسٹی تعلیمی پورٹل', chooseRole: 'اپنا کردار منتخب کریں', studentRole: 'طالب علم',
+        instructorRole: 'استاد', support: 'معاونت', language: 'زبان', navMenu: 'مینو',
+        accountSettings: 'اکاؤنٹ اور ترتیبات', roadmaps: 'تعلیمی نقشہ', gpaCalc: 'GPA کیلکولیٹر',
+        portals: 'AOU پورٹلز', darkMode: 'ڈارک موڈ', signOut: 'لاگ آؤٹ'
+      },
+      fa: {
+        welcomeSubtitle: 'فضای آموزشی دانشگاه آزاد عربی', chooseRole: 'نقش خود را انتخاب کنید', studentRole: 'دانشجو',
+        instructorRole: 'استاد', support: 'پشتیبانی', language: 'زبان', navMenu: 'منو',
+        accountSettings: 'حساب و تنظیمات', roadmaps: 'نقشه درسی', gpaCalc: 'محاسبه معدل',
+        portals: 'پورتال‌های AOU', darkMode: 'حالت تیره', signOut: 'خروج'
+      }
+    };
+
+    function t(code) {
+      if (code === 'ar') return STRINGS_AR;
+      return Object.assign({}, STRINGS_EN, EXTRA_LANGS[code] || {});
+    }
+
+    const AOU_BRANCHES = [
+      { name: 'Riyadh', country: 'Saudi Arabia · Riyadh HQ', sis: 'https://sis.arabou.edu.sa/', lms: 'https://lms.arabou.edu.sa/', adm: 'https://www.arabou.edu.sa/admission/pages/default.aspx' },
+      { name: 'Jeddah', country: 'Saudi Arabia · Jeddah', sis: 'https://sis.arabou.edu.sa/', lms: 'https://lms.arabou.edu.sa/', adm: 'https://www.arabou.edu.sa/jeddah/pages/default.aspx' },
+      { name: 'Dammam', country: 'Saudi Arabia · Dammam', sis: 'https://sis.arabou.edu.sa/', lms: 'https://lms.arabou.edu.sa/', adm: 'https://www.arabou.edu.sa/dammam/pages/default.aspx' },
+      { name: 'Madinah', country: 'Saudi Arabia · Madinah', sis: 'https://sis.arabou.edu.sa/', lms: 'https://lms.arabou.edu.sa/', adm: 'https://www.arabou.edu.sa/madinah/pages/default.aspx' },
+      { name: 'Hail', country: 'Saudi Arabia · Hail', sis: 'https://sis.arabou.edu.sa/', lms: 'https://lms.arabou.edu.sa/', adm: 'https://www.arabou.edu.sa/hail/pages/default.aspx' },
+      { name: 'Al-Ahsa', country: 'Saudi Arabia · Al-Ahsa', sis: 'https://sis.arabou.edu.sa/', lms: 'https://lms.arabou.edu.sa/', adm: 'https://www.arabou.edu.sa/ahsa/pages/default.aspx' },
+      { name: 'Kuwait', country: 'Kuwait Campus', sis: 'https://siskw.aou.edu.kw/', lms: 'https://lms.aou.edu.kw/', adm: 'https://www.aou.edu.kw/' },
+      { name: 'Egypt', country: 'Egypt Campus', sis: 'https://sis.aou.edu.eg/', lms: 'https://lms.aou.edu.eg/', adm: 'https://www.aou.edu.eg/' },
+      { name: 'Jordan', country: 'Jordan Campus', sis: 'https://sis.aou.edu.jo/', lms: 'https://lms.aou.edu.jo/', adm: 'https://www.aou.edu.jo/' },
+      { name: 'Lebanon', country: 'Lebanon Campus', sis: 'https://sis.aou.edu.lb/', lms: 'https://lms.aou.edu.lb/', adm: 'https://www.aou.edu.lb/' },
+      { name: 'Bahrain', country: 'Bahrain Campus', sis: 'https://sis.aou.org.bh/', lms: 'https://lms.aou.org.bh/', adm: 'https://www.aou.org.bh/' },
+      { name: 'Oman', country: 'Oman Campus', sis: 'https://sis.aou.edu.om/', lms: 'https://lms.aou.edu.om/', adm: 'https://www.aou.edu.om/' }
+    ];
+
+    const SUPPORT_CONTACTS = [
+      { dept: 'Student Affairs', topic: 'Student Affairs Coordinator', email: 'h.albeeshi@arabou.edu.sa', branch: 'Riyadh' },
+      { dept: 'IT Department', topic: 'Campus Systems & Network', email: 's.ahmed@arabou.edu.sa', branch: 'Riyadh' },
+      { dept: 'Admission & Registration', topic: 'Admissions Specialist', email: 'g.binzunefr@arabou.edu.sa', branch: 'Jeddah' },
+      { dept: 'Financial Department', topic: 'Tuition & Fee Clearance', email: 'm.abuhaimed@arabou.edu.sa', branch: 'Riyadh' },
+      { dept: 'Faculties & Units', topic: 'Faculty of Computer Studies (FCS)', email: 'fcs.office@arabou.edu.sa', branch: 'All Branches' },
+      { dept: 'Technical Support', topic: 'LMS Platform Support', email: 'lms@arabou.edu.sa', branch: 'All Branches' },
+      { dept: 'Technical Support', topic: 'SIS Student Portal Support', email: 'sis.support@arabou.edu.sa', branch: 'All Branches' }
+    ];
+
+    // SIS Grading Scale: A is highest (4.0) down to F (0.0), NO A+
+    const SIS_GRADES = [
+      { label: 'A', pts: 4.0 },
+      { label: 'B+', pts: 3.5 },
+      { label: 'B', pts: 3.0 },
+      { label: 'C+', pts: 2.5 },
+      { label: 'C', pts: 2.0 },
+      { label: 'D+', pts: 1.5 },
+      { label: 'D', pts: 1.0 },
+      { label: 'F', pts: 0.0 }
+    ];
+
+    const c = (code, title, credits, category, stage, prereq = []) => ({ code, title, credits, category, stage, prereq });
+
+    // All 10 AOU Majors with full prerequisites & stages
+    const MAJORS = [
+      {
+        id: 'cs', name: 'Computer Science', totalCredits: 130,
+        courses: [
+          c('GR101','Independent Study Skills',3,'GENERAL',1),
+          c('AR111','Arabic Communication Skills I',3,'GENERAL',1),
+          c('EL111','English Communication Skills I',3,'GENERAL',1),
+          c('TU170','Learning Online & Computing',3,'GENERAL',1),
+          c('MT129','Calculus and Probability',4,'MATH',1,['EL111']),
+          c('AR112','Arabic Communication Skills II',3,'GENERAL',2,['AR111']),
+          c('EL112','English Communication Skills II',3,'GENERAL',2,['EL111']),
+          c('MT131','Discrete Mathematics',4,'MATH',2,['MT129']),
+          c('MT132','Linear Algebra',4,'MATH',2,['MT129']),
+          c('TM103','Computer Organization & Architecture',4,'CORE',3,['EL111','TU170']),
+          c('TM105','Introduction to Programming',4,'CORE',3,['EL111','TU170']),
+          c('TM111','Introduction to Computing & IT I',8,'CORE',3,['EL112','TU170']),
+          c('TM112','Introduction to Computing & IT II',8,'CORE',4,['TM111']),
+          c('M251','Object-Oriented Programming using Java',8,'CORE',4,['TM105']),
+          c('M269','Algorithms, Data Structures & Computability',8,'CORE',4,['M251','MT131']),
+          c('TM240','Computer Graphics & Multimedia',4,'CORE',5,['TM112','MT132']),
+          c('TM298','Operating Systems',4,'CORE',5,['TM103','TM112']),
+          c('TM351','Data Management & Analysis',8,'CORE',6,['M251','TM112']),
+          c('TM354','Software Engineering',8,'CORE',6,['M251']),
+          c('TM366','Artificial Intelligence',8,'CORE',6,['M269']),
+          c('TM471-A','Graduation Project Part I',4,'GRADUATION',7,['TM354','M269']),
+          c('TM471-B','Graduation Project Part II',4,'GRADUATION',8,['TM471-A'])
+        ]
+      },
+      {
+        id: 'itc', name: 'Information Technology & Computing (ITC)', totalCredits: 131,
+        courses: [
+          c('GR101','Independent Study Skills',3,'GENERAL',1),
+          c('AR111','Arabic Communication Skills I',3,'GENERAL',1),
+          c('EL111','English Communication Skills I',3,'GENERAL',1),
+          c('TU170','Learning Online & Computing',3,'GENERAL',1),
+          c('MT129','Calculus and Probability',4,'MATH',1,['EL111']),
+          c('EL112','English Communication Skills II',3,'GENERAL',2,['EL111']),
+          c('MT131','Discrete Mathematics',4,'MATH',2,['MT129']),
+          c('TM105','Introduction to Programming',4,'CORE',3,['EL111']),
+          c('TM111','Introduction to Computing & IT I',8,'CORE',3,['EL112']),
+          c('TM112','Introduction to Computing & IT II',8,'CORE',4,['TM111']),
+          c('M251','Object-Oriented Programming using Java',8,'CORE',4,['TM105']),
+          c('M269','Algorithms & Data Structures',8,'CORE',5,['M251','MT131']),
+          c('TM352','Web, Mobile & Cloud Technologies',8,'CORE',6,['TM112','M251']),
+          c('TM354','Software Engineering',8,'CORE',6,['M251']),
+          c('TM471-A','Graduation Project Part I',4,'GRADUATION',7,['TM354']),
+          c('TM471-B','Graduation Project Part II',4,'GRADUATION',8,['TM471-A'])
+        ]
+      },
+      {
+        id: 'netsec', name: 'Networking & Security', totalCredits: 130,
+        courses: [
+          c('EL111','English Communication Skills I',3,'GENERAL',1),
+          c('TU170','Learning Online & Computing',3,'GENERAL',1),
+          c('EL112','English Communication Skills II',3,'GENERAL',2,['EL111']),
+          c('MT129','Calculus and Probability',4,'MATH',2,['EL111']),
+          c('TM111','Introduction to Computing & IT I',8,'CORE',3,['EL112']),
+          c('T216A','Cisco Networking (CCNA) Part I',8,'CORE',4,['TM111']),
+          c('T216B','Cisco Networking (CCNA) Part II',8,'CORE',5,['T216A']),
+          c('T316','Advanced Routing & Switching (CCNP)',8,'CORE',6,['T216B']),
+          c('T318','Applied Network Security',8,'CORE',6,['T216B']),
+          c('TM471-A','Graduation Project Part I',4,'GRADUATION',7,['T318','T316']),
+          c('TM471-B','Graduation Project Part II',4,'GRADUATION',8,['TM471-A'])
+        ]
+      },
+      {
+        id: 'webdev', name: 'Web Development', totalCredits: 130,
+        courses: [
+          c('EL111','English Communication Skills I',3,'GENERAL',1),
+          c('TU170','Learning Online & Computing',3,'GENERAL',1),
+          c('EL112','English Communication Skills II',3,'GENERAL',2,['EL111']),
+          c('TM105','Introduction to Programming',4,'CORE',3,['EL111']),
+          c('TM111','Introduction to Computing & IT I',8,'CORE',3,['EL112']),
+          c('TM112','Introduction to Computing & IT II',8,'CORE',4,['TM111']),
+          c('M251','Object-Oriented Programming using Java',8,'CORE',4,['TM105']),
+          c('TT284','Web Technologies',8,'CORE',5,['TM112','TM105']),
+          c('TM352','Web, Mobile & Cloud Technologies',8,'CORE',6,['TT284']),
+          c('TM356','Interaction Design & UX',8,'CORE',6,['TT284']),
+          c('TM471-A','Graduation Project Part I',4,'GRADUATION',7,['TT284']),
+          c('TM471-B','Graduation Project Part II',4,'GRADUATION',8,['TM471-A'])
+        ]
+      },
+      {
+        id: 'compbiz', name: 'Computing with Business', totalCredits: 130,
+        courses: [
+          c('EL111','English Communication Skills I',3,'GENERAL',1),
+          c('EL112','English Communication Skills II',3,'GENERAL',2,['EL111']),
+          c('TM105','Introduction to Programming',4,'CORE',3,['EL111']),
+          c('BUS110','Introduction to Business',8,'CORE',3,['EL112']),
+          c('B207A','Shaping Business Opportunities I',8,'CORE',4,['BUS110']),
+          c('M251','Object-Oriented Programming using Java',8,'CORE',4,['TM105']),
+          c('B207B','Shaping Business Opportunities II',8,'CORE',5,['B207A']),
+          c('BUS310','Strategic Management',8,'CORE',6,['B207B']),
+          c('TM351','Data Management & Analysis',8,'CORE',6,['M251']),
+          c('TM471-A','Graduation Project Part I',4,'GRADUATION',7,['TM351','BUS310']),
+          c('TM471-B','Graduation Project Part II',4,'GRADUATION',8,['TM471-A'])
+        ]
+      },
+      {
+        id: 'acct_en', name: 'Business Admin - Accounting (English)', totalCredits: 132,
+        courses: [
+          c('EL111','English Communication Skills I',3,'GENERAL',1),
+          c('EL112','English Communication Skills II',3,'GENERAL',2,['EL111']),
+          c('BUS110','Introduction to Business',8,'CORE',2,['EL112']),
+          c('STAT201','Business Statistics',3,'MATH',3,['EL111']),
+          c('B124','Fundamentals of Accounting',4,'CORE',3,['EL112']),
+          c('ACCT201','Financial Accounting I',4,'CORE',4,['B124']),
+          c('ACCT202','Financial Accounting II',4,'CORE',5,['ACCT201']),
+          c('ACCT301','Intermediate Accounting I',4,'CORE',6,['ACCT202']),
+          c('ACCT340','Auditing Principles',4,'CORE',7,['ACCT301']),
+          c('BUS490','Business Capstone Project',4,'GRADUATION',8,['ACCT340'])
+        ]
+      },
+      {
+        id: 'acct_ar', name: 'Business Admin - Accounting (Arabic)', totalCredits: 132,
+        courses: [
+          c('AR111','Arabic Communication Skills I',3,'GENERAL',1),
+          c('AR112','Arabic Communication Skills II',3,'GENERAL',2,['AR111']),
+          c('BUS110','Introduction to Business (Arabic)',8,'CORE',2),
+          c('MATH201','Business Mathematics',3,'MATH',3),
+          c('STAT201','Business Statistics',3,'MATH',4,['MATH201']),
+          c('ACCT201','Financial Accounting I',4,'CORE',4),
+          c('ACCT202','Financial Accounting II',4,'CORE',5,['ACCT201']),
+          c('ACCT322','Zakat & Tax Accounting',4,'CORE',6,['ACCT202']),
+          c('ACCT340','Auditing & Assurance',4,'CORE',7,['ACCT322']),
+          c('BUS490','Graduation Project in Accounting',4,'GRADUATION',8,['ACCT340'])
+        ]
+      },
+      {
+        id: 'mkt', name: 'Business Admin - Marketing', totalCredits: 130,
+        courses: [
+          c('EL111','English Communication Skills I',3,'GENERAL',1),
+          c('EL112','English Communication Skills II',3,'GENERAL',2,['EL111']),
+          c('BUS110','Introduction to Business',8,'CORE',2,['EL112']),
+          c('STAT201','Business Statistics',3,'MATH',3,['EL111']),
+          c('MKT201','Principles of Marketing',4,'CORE',4,['BUS110']),
+          c('MKT205','Consumer Behavior',4,'CORE',5,['MKT201']),
+          c('MKT302','Marketing Research',4,'CORE',6,['MKT201','STAT201']),
+          c('MKT305','Digital & Social Media Marketing',4,'CORE',7,['MKT205']),
+          c('BUS490','Marketing Capstone Project',4,'GRADUATION',8,['MKT302','MKT305'])
+        ]
+      },
+      {
+        id: 'sys_mgt', name: 'Business Admin - Systems / Management', totalCredits: 130,
+        courses: [
+          c('EL111','English Communication Skills I',3,'GENERAL',1),
+          c('TU170','Learning Online & Computing',3,'GENERAL',1),
+          c('BUS110','Introduction to Business',8,'CORE',2,['EL111']),
+          c('MGT201','Principles of Management',3,'CORE',3,['BUS110']),
+          c('MIS201','Management Information Systems',4,'CORE',4,['BUS110','TU170']),
+          c('MIS301','Enterprise Systems & Analytics',4,'CORE',6,['MIS201']),
+          c('BUS310','Strategic Management',4,'CORE',7,['MGT201']),
+          c('BUS490','Systems & Management Capstone',4,'GRADUATION',8,['MIS301','BUS310'])
+        ]
+      },
+      {
+        id: 'ell', name: 'English Language & Literature', totalCredits: 128,
+        courses: [
+          c('EL111','English Communication Skills I',3,'GENERAL',1),
+          c('AR111','Arabic Communication Skills I',3,'GENERAL',1),
+          c('EL112','English Communication Skills II',3,'GENERAL',2,['EL111']),
+          c('EL120','English Phonetics & Linguistics',4,'CORE',2,['EL111']),
+          c('EL121','The Short Story & Essay Writing',4,'CORE',2,['EL111']),
+          c('EL210','Advanced Reading & Writing',4,'CORE',3,['EL112']),
+          c('EL118','English Grammar & Syntax',4,'CORE',4,['EL120']),
+          c('U214A','Worlds of English Part I',8,'CORE',5,['EL120','EL118']),
+          c('U214B','Worlds of English Part II',8,'CORE',6,['U214A']),
+          c('E304A','Exploring English Grammar I',8,'CORE',7,['U214B']),
+          c('EL400','Senior Research Project in ELL',6,'GRADUATION',8,['E304A'])
+        ]
+      }
+    ];
+
+    const RINGTONES = [
+      { id: 'chime', name: 'Crystal Chime', freqs: [523, 659, 784] },
+      { id: 'bell', name: 'Academic Bell', freqs: [440, 554, 659] },
+      { id: 'calm', name: 'Soft Harp', freqs: [392, 494, 587] },
+      { id: 'pulse', name: 'Focus Pulse', freqs: [660, 880, 660] }
+    ];
+
+    function playRingtone(id) {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const opt = RINGTONES.find((r) => r.id === id) || RINGTONES[0];
+        opt.freqs.forEach((f, idx) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.value = f;
+          gain.gain.setValueAtTime(0.001, ctx.currentTime + idx * 0.16);
+          gain.gain.exponentialRampToValueAtTime(0.18, ctx.currentTime + idx * 0.16 + 0.04);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + idx * 0.16 + 0.35);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(ctx.currentTime + idx * 0.16);
+          osc.stop(ctx.currentTime + idx * 0.16 + 0.38);
+        });
+      } catch (_) {}
+    }
+
+    const DEFAULT_STATE = {
+      loggedIn: false,
+      authProvider: 'demo',
+      role: 'STUDENT',
+      language: 'en',
+      darkMode: false,
+      fontScale: 1,
+      branch: 'Riyadh',
+      majorId: 'cs',
+      avatarDataUrl: '',
+      studentTab: 'home',
+      instructorTab: 'smart_inbox',
+      drawerOpen: false,
+      drawerSettingsTab: false,
+      showSupportModal: false,
+      showDownloadsModal: false,
+      roadmapInspectCode: null,
+      roadmapZoom: window.innerWidth < 600 ? 70 : 100,
+      roadmapPanX: 0,
+      roadmapPanY: 0,
+      courseStatuses: {},
+      gpaCourses: [
+        { id: 'g1', code: 'M251', credits: 8, grade: 'A', pts: 4.0 },
+        { id: 'g2', code: 'TM112', credits: 8, grade: 'B+', pts: 3.5 }
+      ],
+      priorGpa: '',
+      priorCredits: '',
+      pomodoroMinutes: 25,
+      pomodoroSecondsLeft: 25 * 60,
+      pomodoroRunning: false,
+      pomodoroCompanion: 'girl',
+      focusMinutesLogged: 30,
+      books: [
+        {
+          id: 'b1',
+          title: 'M251 Java OOP Handbook (Ch. 1–4)',
+          content: 'Encapsulation bundles fields and methods inside classes with private access modifiers. Inheritance lets subclasses extend superclasses using extends. Polymorphism enables overridden methods to dispatch dynamically at runtime.'
+        },
+        {
+          id: 'b2',
+          title: 'TM112 Computing & Networks Notes',
+          content: 'TCP guarantees ordered packet delivery using three-way handshake SYN, SYN-ACK, ACK. Binary two’s complement represents signed integers by inverting bits and adding one.'
+        }
+      ],
+      bookMessages: [],
+      materials: [
+        { id: 'm1', code: 'M251', title: 'Week 4: Polymorphism & Interfaces Slides', desc: 'Uploaded by Instructor · Lecture Deck', link: 'https://lms.arabou.edu.sa/', attachment: '' },
+        { id: 'm2', code: 'TM354', title: 'UML Use Case & Class Diagrams Guide', desc: 'Software Engineering Revision Sheet', link: '', attachment: '' }
+      ],
+      emails: [
+        { id: 'e1', sender: 'Dr. Omar Al-Harbi', code: 'M251', subject: 'TMA Part 2 Submission Window', body: 'Please upload your Java project archive to LMS before Thursday 11:55 PM.', priority: 'CRITICAL', answered: false, summary: '' },
+        { id: 'e2', sender: 'Student Sara M.', code: 'M251', subject: 'Question on TMA-2 UML Diagram', body: 'Should the class diagram include helper private methods in M251 TMA-2?', priority: 'HIGH', answered: false, summary: '' },
+        { id: 'e3', sender: 'Student Tariq A.', code: 'M251', subject: 'TMA-2 UML Class Diagram format', body: 'Can we export the M251 TMA-2 UML diagram as PDF or PNG inside the zip?', priority: 'HIGH', answered: false, summary: '' },
+        { id: 'e4', sender: 'AOU Registration', code: 'AOU', subject: 'Midterm Exam Schedule Published', body: 'Check SIS portal for branch hall allocations and seating numbers.', priority: 'NORMAL', answered: false, summary: '' },
+        { id: 'e5', sender: 'Campus Library', code: 'LIB', subject: 'New Digital E-Books Available', body: 'IEEE & Springer CS collections unlocked via student credentials.', priority: 'LOW', answered: true, summary: '' }
+      ],
+      clusters: [],
+      forumPosts: [
+        { id: 'f1', author: 'Freshman Guide', category: 'Orientation', title: 'How to link SIS & LMS on first week?', body: 'Use your AOU university ID and Microsoft Entra credentials via the Portals tab.', attachment: '', replies: ['Thanks! Worked smoothly.'] }
+      ],
+      chats: [
+        { id: 'c1', author: 'Dr. Omar', text: 'Office hours today 4:00 PM – 5:30 PM on LMS.', attachment: '' },
+        { id: 'c2', author: 'CS Cohort', text: 'Anyone studying M269 recursion trees tonight?', attachment: '' }
+      ],
+      voiceNotes: [],
+      events: [
+        { id: 'ev1', code: 'M251', title: 'TMA-2 Deadline', ts: Date.now() + 3600 * 1000 * 28, ringtone: 'chime' },
+        { id: 'ev2', code: 'M269', title: 'Algorithm Quiz Review', ts: Date.now() + 3600 * 1000 * 74, ringtone: 'bell' }
+      ],
+      activeAlarm: null,
+      emailFilter: 'ALL',
+      emailSearch: '',
+      supportDept: 'All',
+      supportBranch: 'All Branches'
+    };
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return structuredClone(DEFAULT_STATE);
+        return Object.assign(structuredClone(DEFAULT_STATE), JSON.parse(raw), {
+          pomodoroRunning: false,
+          drawerOpen: false,
+          activeAlarm: null
+        });
+      } catch (_) {
+        return structuredClone(DEFAULT_STATE);
+      }
+    }
+
+    let state = loadState();
+    function saveState() {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (_) {}
+    }
+
+    function applyThemeAndLocale() {
+      const langObj = LANGUAGES.find((l) => l.code === state.language) || LANGUAGES[0];
+      document.documentElement.lang = langObj.code;
+      document.documentElement.dir = langObj.rtl ? 'rtl' : 'ltr';
+      document.documentElement.style.setProperty('--font-scale', String(state.fontScale || 1));
+      document.body.classList.toggle('dark', !!state.darkMode);
+      document.body.classList.toggle('role-instructor', state.role === 'INSTRUCTOR');
+    }
+
+    function esc(str) {
+      return String(str ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function catColor(cat) {
+      return {
+        GENERAL: 'var(--cat-general)',
+        MATH: 'var(--cat-math)',
+        CORE: 'var(--cat-core)',
+        GRADUATION: 'var(--cat-grad)'
+      }[cat] || 'var(--cat-core)';
+    }
+
+    function catLabel(cat, S) {
+      return {
+        GENERAL: S.catGeneral,
+        MATH: S.catMath,
+        CORE: S.catCore,
+        GRADUATION: S.catGrad
+      }[cat] || S.catCore;
+    }
+
+    function statusColor(st) {
+      return {
+        COMPLETED: '#2456A6',
+        IN_PROGRESS: '#3986D9',
+        NEXT_TERM: '#7056B3',
+        NOT_STARTED: '#526783'
+      }[st] || '#526783';
+    }
+
+    function statusLabel(st, S) {
+      return {
+        COMPLETED: S.statusCompleted,
+        IN_PROGRESS: S.statusInProgress,
+        NEXT_TERM: S.statusNextTerm,
+        NOT_STARTED: S.statusNotStarted
+      }[st] || S.statusNotStarted;
+    }
+
+    function formatCountdown(ts) {
+      const diff = Math.max(0, ts - Date.now());
+      const sec = Math.floor(diff / 1000);
+      const d = Math.floor(sec / 86400);
+      const h = Math.floor((sec % 86400) / 3600);
+      const m = Math.floor((sec % 3600) / 60);
+      const s = sec % 60;
+      return d > 0 ? `${d}d ${h}h ${m}m ${s}s` : `${String(h).padStart(2,'0')}h ${String(m).padStart(2,'0')}m ${String(s).padStart(2,'0')}s`;
+    }
+
+    // Book-Only Study Assistant (Strictly from state.books)
+    function answerFromBooksOnly(query) {
+      const q = query.trim().toLowerCase();
+      if (!q) return '';
+      const words = q.split(/\s+/).filter((w) => w.length > 2);
+      const scored = state.books.map((b) => {
+        const hay = (b.title + ' ' + b.content).toLowerCase();
+        const hits = words.reduce((acc, w) => acc + (hay.includes(w) ? 1 : 0), 0);
+        return { book: b, hits };
+      }).filter((x) => x.hits > 0).sort((a, b) => b.hits - a.hits);
+
+      if (!scored.length) {
+        return state.language === 'ar'
+          ? 'لم يتم العثور على هذا المفهوم في كتبك وملاحظاتك المرفوعة. أضف نص المادة أولاً لأن المساعد يجيب من كتبك فقط.'
+          : 'Not found in your uploaded UniSync books & notes. This assistant strictly answers from your in-app books only.';
+      }
+      const top = scored[0].book;
+      return `📖 [${top.title}]: ${top.content}`;
+    }
+
+    // Main Render Loop
+    function render() {
+      applyThemeAndLocale();
+      const S = t(state.language);
+      const root = document.getElementById('app');
+
+      if (!state.loggedIn) {
+        root.innerHTML = renderAuthScreen(S);
+        bindAuthEvents(S);
+        return;
+      }
+
+      root.innerHTML = renderWorkspace(S);
+      bindWorkspaceEvents(S);
+    }
+
+    function renderAuthScreen(S) {
+      const currentLang = LANGUAGES.find((l) => l.code === state.language) || LANGUAGES[0];
+      return `
+        <div class="auth-wrap">
+          <div class="auth-topbar">
+            <button id="authSupportBtn" class="pill" type="button">
+              <span>🎧</span><span>${esc(S.support)}</span>
+            </button>
+            <div class="row" style="gap:6px">
+              <label for="authLangSelect" class="sr-only" style="position:absolute;opacity:0;pointer-events:none">${esc(S.language)}</label>
+              <select id="authLangSelect" class="pill" aria-label="${esc(S.language)}">
+                ${LANGUAGES.map((l) => `<option value="${l.code}" ${l.code === currentLang.code ? 'selected' : ''}>🌐 ${esc(l.native)}</option>`).join('')}
+              </select>
+            </div>
+          </div>
+
+          <img src="./icon.svg" alt="UniSync" class="brand-logo" />
+          <h1 style="margin:10px 0 4px;font-size:1.55rem;font-weight:800;">UniSync</h1>
+          <p class="muted" style="margin:0 0 18px;text-align:center;">${esc(S.welcomeSubtitle)}</p>
+
+          <div class="card auth-card">
+            <div style="font-weight:700;text-align:center;">${esc(S.chooseRole)}</div>
+            <div class="role-grid">
+              <button type="button" class="role-tile ${state.role === 'STUDENT' ? 'active' : ''}" data-role="STUDENT">
+                <div style="font-size:1.35rem;">🎓</div>
+                <div style="font-weight:700;margin-top:4px;">${esc(S.studentRole)}</div>
+                <div class="muted" style="font-size:0.78rem;">${esc(S.studentRoleSub)}</div>
+              </button>
+              <button type="button" class="role-tile ${state.role === 'INSTRUCTOR' ? 'active' : ''}" data-role="INSTRUCTOR">
+                <div style="font-size:1.35rem;">💻</div>
+                <div style="font-weight:700;margin-top:4px;">${esc(S.instructorRole)}</div>
+                <div class="muted" style="font-size:0.78rem;">${esc(S.instructorRoleSub)}</div>
+              </button>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <button id="btnGoogleSignIn" type="button" class="btn btn-primary" style="width:100%;">
+                <span>🔵</span><span>${esc(S.signInGoogle)}</span>
+              </button>
+              <button id="btnMicrosoftSignIn" type="button" class="btn btn-outline" style="width:100%;">
+                <span>📧</span><span>${esc(S.signInMicrosoft)}</span>
+              </button>
+              <button id="btnDemoEntry" type="button" class="btn btn-soft" style="width:100%;">
+                <span>▶️</span><span>${esc(S.tryDemo)} (${esc(state.role === 'STUDENT' ? S.studentRole : S.instructorRole)})</span>
+              </button>
+            </div>
+            <div id="authNotice" class="muted" style="margin-top:10px;text-align:center;font-size:0.8rem;"></div>
+          </div>
+
+          <button id="btnOpenDownloads" type="button" class="btn btn-outline btn-sm" style="margin-top:14px;">
+            <span>📲</span><span>${esc(S.getApps)}</span>
+          </button>
+        </div>
+        ${state.showSupportModal ? renderSupportModal(S) : ''}
+        ${state.showDownloadsModal ? renderDownloadsModal(S) : ''}
+      `;
+    }
+
+    function renderWorkspace(S) {
+      const studentTabs = [
+        { id: 'home', icon: '🏠', label: S.home },
+        { id: 'inbox', icon: '📥', label: S.inbox },
+        { id: 'pomodoro', icon: '⏱️', label: S.pomodoro },
+        { id: 'hub', icon: '📚', label: S.studyHub },
+        { id: 'roadmaps', icon: '🗺️', label: S.roadmaps }
+      ];
+      const instructorTabs = [
+        { id: 'smart_inbox', icon: '📧', label: S.smartInbox },
+        { id: 'calendar', icon: '📅', label: S.calendar },
+        { id: 'materials', icon: '☁️', label: S.materials },
+        { id: 'chat_email', icon: '💬', label: S.chatEmail }
+      ];
+      const bottomTabs = state.role === 'STUDENT' ? studentTabs : instructorTabs;
+      const activeTab = state.role === 'STUDENT' ? state.studentTab : state.instructorTab;
+
+      const avatarMarkup = state.avatarDataUrl
+        ? `<img src="${state.avatarDataUrl}" alt="${esc(S.profilePhoto)}" />`
+        : `<span style="font-size:1.15rem;">👤</span>`;
+
+      let mainHtml = '';
+      if (state.role === 'STUDENT') {
+        if (activeTab === 'home') mainHtml = renderStudentHome(S);
+        else if (activeTab === 'inbox') mainHtml = renderStudentInbox(S);
+        else if (activeTab === 'pomodoro') mainHtml = renderPomodoro(S);
+        else if (activeTab === 'calendar') mainHtml = renderCalendarScreen(S);
+        else if (activeTab === 'chat') mainHtml = renderChatScreen(S);
+        else if (activeTab === 'hub') mainHtml = renderStudyHub(S);
+        else if (activeTab === 'roadmaps') mainHtml = renderRoadmapScreen(S);
+        else if (activeTab === 'gpa') mainHtml = renderGpaScreen(S);
+        else if (activeTab === 'portals') mainHtml = renderPortalsScreen(S);
+        else if (activeTab === 'support') mainHtml = renderSupportScreen(S);
+      } else {
+        if (activeTab === 'smart_inbox') mainHtml = renderInstructorDashboard(S);
+        else if (activeTab === 'calendar') mainHtml = renderCalendarScreen(S);
+        else if (activeTab === 'materials') mainHtml = renderInstructorMaterials(S);
+        else if (activeTab === 'chat_email') mainHtml = renderChatScreen(S);
+        else if (activeTab === 'portals') mainHtml = renderPortalsScreen(S);
+        else if (activeTab === 'support') mainHtml = renderSupportScreen(S);
+      }
+
+      return `
+        <header class="topbar">
+          <div class="row">
+            <button id="openDrawerBtn" type="button" class="btn btn-outline btn-sm" aria-label="Menu" style="min-width:42px;min-height:42px;">☰</button>
+            <img src="./icon.svg" alt="UniSync" style="width:34px;height:34px;border-radius:10px;" />
+            <div>
+              <div style="font-weight:800;line-height:1.1;">UniSync</div>
+              <div class="muted" style="font-size:0.75rem;">${esc(state.role === 'STUDENT' ? S.studentRole : S.instructorRole)} · ${esc(state.branch)}</div>
+            </div>
+          </div>
+          <div class="row">
+            <button id="topThemeToggle" type="button" class="btn btn-outline btn-sm" title="${esc(S.darkMode)}">${state.darkMode ? '☀️' : '🌙'}</button>
+            <button id="openAccountDrawerBtn" type="button" class="avatar-btn" title="${esc(S.accountSettings)}">${avatarMarkup}</button>
+          </div>
+        </header>
+
+        <main class="container">${mainHtml}</main>
+
+        <nav class="bottom-nav">
+          ${bottomTabs.map((tab) => `
+            <button type="button" class="nav-tab ${activeTab === tab.id ? 'active' : ''}" data-nav="${tab.id}">
+              <span style="font-size:1.1rem;">${tab.icon}</span>
+              <span>${esc(tab.label)}</span>
+            </button>
+          `).join('')}
+        </nav>
+
+        ${state.drawerOpen ? renderSideDrawer(S, avatarMarkup) : ''}
+        ${state.roadmapInspectCode ? renderCourseDetailModal(S) : ''}
+        ${state.showSupportModal ? renderSupportModal(S) : ''}
+        ${state.showDownloadsModal ? renderDownloadsModal(S) : ''}
+        ${state.activeAlarm ? renderAlarmOverlay(S) : ''}
+      `;
+    }
+
+    function renderSideDrawer(S, avatarMarkup) {
+      const studentDrawerItems = [
+        { id: 'home', icon: '🏠', label: S.home },
+        { id: 'inbox', icon: '📥', label: S.inbox },
+        { id: 'pomodoro', icon: '⏱️', label: S.pomodoro },
+        { id: 'calendar', icon: '📅', label: S.calendar },
+        { id: 'chat', icon: '💬', label: S.chat },
+        { id: 'hub', icon: '📚', label: S.studyHub },
+        { id: 'roadmaps', icon: '🗺️', label: S.roadmaps },
+        { id: 'gpa', icon: '🧮', label: S.gpaCalc },
+        { id: 'portals', icon: '🌐', label: S.portals },
+        { id: 'support', icon: '🎧', label: S.support }
+      ];
+      const instructorDrawerItems = [
+        { id: 'smart_inbox', icon: '📧', label: S.smartInbox },
+        { id: 'calendar', icon: '📅', label: S.calendar },
+        { id: 'materials', icon: '☁️', label: S.materials },
+        { id: 'chat_email', icon: '💬', label: S.chatEmail },
+        { id: 'portals', icon: '🌐', label: S.portals },
+        { id: 'support', icon: '🎧', label: S.support }
+      ];
+      const items = state.role === 'STUDENT' ? studentDrawerItems : instructorDrawerItems;
+      const activeTab = state.role === 'STUDENT' ? state.studentTab : state.instructorTab;
+
+      return `
+        <div id="drawerBackdrop" class="drawer-backdrop">
+          <aside class="drawer-panel">
+            <div style="padding:14px 16px;border-bottom:1px solid var(--border);">
+              <div class="between">
+                <div class="row">
+                  <img src="./icon.svg" alt="UniSync" style="width:38px;height:38px;border-radius:11px;" />
+                  <div>
+                    <div style="font-weight:800;">UniSync</div>
+                    <div class="muted" style="font-size:0.75rem;">${esc(S.aouPrefix)} · ${esc(state.branch)}</div>
+                  </div>
+                </div>
+                <button id="closeDrawerBtn" type="button" class="btn btn-outline btn-sm">✕</button>
+              </div>
+              <div class="row" style="margin-top:12px;">
+                <button id="drawerTabNavBtn" type="button" class="pill ${!state.drawerSettingsTab ? 'active' : ''}" style="flex:1;justify-content:center;">${esc(S.navMenu)}</button>
+                <button id="drawerTabSettingsBtn" type="button" class="pill ${state.drawerSettingsTab ? 'active' : ''}" style="flex:1.3;justify-content:center;">⚙️ ${esc(S.accountSettings)}</button>
+              </div>
+            </div>
+
+            <div class="drawer-scroll">
+              ${!state.drawerSettingsTab ? `
+                ${items.map((it) => `
+                  <button type="button" class="drawer-nav-item ${activeTab === it.id ? 'active' : ''}" data-drawer-nav="${it.id}">
+                    <span>${it.icon}</span><span>${esc(it.label)}</span>
+                  </button>
+                `).join('')}
+                <hr style="border:none;border-top:1px solid var(--border);margin:6px 0;" />
+                <button id="drawerGoSettingsLink" type="button" class="drawer-nav-item">
+                  <span>⚙️</span><span>${esc(S.accountSettings)}</span>
+                </button>
+              ` : `
+                <div class="row" style="align-items:center;">
+                  <label for="avatarUploadInput" class="avatar-btn" style="width:52px;height:52px;position:relative;" title="${esc(S.profilePhoto)}">
+                    ${avatarMarkup}
+                  </label>
+                  <input id="avatarUploadInput" type="file" accept="image/*" class="hidden" />
+                  <div style="flex:1;">
+                    <div style="font-weight:700;">${esc(S.profilePhoto)}</div>
+                    <div class="muted" style="font-size:0.78rem;">${esc(S.tapPhoto)}</div>
+                  </div>
+                </div>
+
+                <div class="card" style="background:var(--surface-alt);padding:10px;font-size:0.78rem;">
+                  🔒 ${esc(S.dataProtection)}
+                </div>
+
+                <div style="font-weight:700;font-size:0.84rem;">${esc(S.chooseRole)}</div>
+                <div class="row">
+                  <button type="button" class="pill ${state.role === 'STUDENT' ? 'active' : ''}" data-drawer-role="STUDENT">🎓 ${esc(S.studentRole)}</button>
+                  <button type="button" class="pill ${state.role === 'INSTRUCTOR' ? 'active' : ''}" data-drawer-role="INSTRUCTOR">💻 ${esc(S.instructorRole)}</button>
+                </div>
+
+                <label style="font-weight:700;font-size:0.84rem;">${esc(S.branch)}</label>
+                <select id="drawerBranchSelect" class="select">
+                  ${AOU_BRANCHES.map((b) => `<option value="${b.name}" ${state.branch === b.name ? 'selected' : ''}>${esc(b.name)}</option>`).join('')}
+                </select>
+
+                ${state.role === 'STUDENT' ? `
+                  <label style="font-weight:700;font-size:0.84rem;">${esc(S.major)}</label>
+                  <select id="drawerMajorSelect" class="select">
+                    ${MAJORS.map((m) => `<option value="${m.id}" ${state.majorId === m.id ? 'selected' : ''}>${esc(m.name)}</option>`).join('')}
+                  </select>
+                ` : ''}
+
+                <label style="font-weight:700;font-size:0.84rem;">${esc(S.language)}</label>
+                <select id="drawerLangSelect" class="select">
+                  ${LANGUAGES.map((l) => `<option value="${l.code}" ${state.language === l.code ? 'selected' : ''}>${esc(l.native)} (${esc(l.en)})</option>`).join('')}
+                </select>
+
+                <div style="font-weight:700;font-size:0.84rem;">${esc(S.fontSize)}</div>
+                <div class="row">
+                  <button type="button" class="pill ${state.fontScale === 1 ? 'active' : ''}" data-font-scale="1">${esc(S.fontCompact)}</button>
+                  <button type="button" class="pill ${state.fontScale === 1.12 ? 'active' : ''}" data-font-scale="1.12">${esc(S.fontLarge)}</button>
+                  <button type="button" class="pill ${state.fontScale === 1.24 ? 'active' : ''}" data-font-scale="1.24">${esc(S.fontXLarge)}</button>
+                </div>
+
+                <div class="between" style="padding:4px 0;">
+                  <span style="font-weight:700;">${esc(S.darkMode)}</span>
+                  <button id="drawerDarkToggle" type="button" class="pill ${state.darkMode ? 'active' : ''}">${state.darkMode ? '🌙 ON' : '☀️ OFF'}</button>
+                </div>
+
+                <button id="drawerDownloadsBtn" type="button" class="btn btn-outline btn-sm" style="width:100%;">📲 ${esc(S.getApps)}</button>
+                <button id="drawerSignOutBtn" type="button" class="btn btn-danger" style="width:100%;">${esc(S.signOut)}</button>
+              `}
+            </div>
+          </aside>
+        </div>
+      `;
+    }
+
+    function renderStudentHome(S) {
+      const nextEv = [...state.events].sort((a, b) => a.ts - b.ts)[0];
+      return `
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div class="card" style="background:var(--primary);color:var(--on-primary);">
+            <div class="between">
+              <span style="font-weight:700;font-size:0.82rem;opacity:0.9;">⏰ ${esc(S.nextUp.toUpperCase())}</span>
+              <button type="button" class="btn btn-sm" style="background:rgba(255,255,255,0.2);color:inherit;" data-nav="calendar">${esc(S.calendar)}</button>
+            </div>
+            ${nextEv ? `
+              <div style="font-size:1.1rem;font-weight:800;margin-top:6px;">${esc(nextEv.code)} · ${esc(nextEv.title)}</div>
+              <div id="liveCountdownValue" style="font-size:1.6rem;font-weight:800;margin-top:4px;">${formatCountdown(nextEv.ts)}</div>
+            ` : `<div style="margin-top:8px;">No upcoming events</div>`}
+          </div>
+
+          <div class="grid-2">
+            <div class="card" style="cursor:pointer;" data-nav="roadmaps">
+              <div style="font-weight:800;">🗺️ ${esc(S.roadmaps)}</div>
+              <div class="muted" style="margin-top:4px;">10 AOU Majors · 0%–200% Zoom</div>
+            </div>
+            <div class="card" style="cursor:pointer;" data-nav="pomodoro">
+              <div style="font-weight:800;">⏱️ ${esc(S.pomodoro)}</div>
+              <div class="muted" style="margin-top:4px;">${state.focusMinutesLogged} min studied</div>
+            </div>
+            <div class="card" style="cursor:pointer;" data-nav="gpa">
+              <div style="font-weight:800;">🧮 ${esc(S.gpaCalc)}</div>
+              <div class="muted" style="margin-top:4px;">SIS A–F Scale (Max A = 4.0)</div>
+            </div>
+            <div class="card" style="cursor:pointer;" data-nav="hub">
+              <div style="font-weight:800;">📚 ${esc(S.studyHub)}</div>
+              <div class="muted" style="margin-top:4px;">${esc(S.bookAssistant)}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderStudentInbox(S) {
+      const list = state.emails.filter((e) => state.emailFilter === 'ALL' || e.priority === state.emailFilter);
+      return `
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div class="between">
+            <h2 style="margin:0;font-size:1.15rem;">📥 ${esc(S.inbox)}</h2>
+            <div class="row">
+              ${['ALL','CRITICAL','HIGH','NORMAL','LOW'].map((p) => `
+                <button type="button" class="pill ${state.emailFilter === p ? 'active' : ''}" data-email-filter="${p}">${p}</button>
+              `).join('')}
+            </div>
+          </div>
+
+          <div class="card">
+            <div style="font-weight:700;margin-bottom:8px;">✉️ ${esc(S.compose)}</div>
+            <div class="grid-2">
+              <input id="composeTo" class="input" placeholder="To / Course (e.g. M251)" />
+              <input id="composeSub" class="input" placeholder="Subject" />
+            </div>
+            <textarea id="composeBody" class="textarea" rows="2" style="margin-top:8px;" placeholder="Message..."></textarea>
+            <div class="between" style="margin-top:8px;">
+              <label class="btn btn-outline btn-sm" style="cursor:pointer;">
+                📎 ${esc(S.attach)}
+                <input id="composeFile" type="file" class="hidden" />
+              </label>
+              <button id="btnSendEmail" type="button" class="btn btn-primary btn-sm">${esc(S.send)}</button>
+            </div>
+            <div id="composeFileName" class="muted" style="font-size:0.78rem;margin-top:4px;"></div>
+          </div>
+
+          ${list.map((e) => `
+            <div class="card">
+              <div class="between">
+                <div>
+                  <span class="prio-badge prio-${e.priority}">${e.priority}</span>
+                  <strong style="margin-inline-start:6px;">${esc(e.code)} · ${esc(e.subject)}</strong>
+                </div>
+                <span class="muted">${esc(e.sender)}</span>
+              </div>
+              <p style="margin:8px 0 6px;">${esc(e.body)}</p>
+              ${e.summary ? `<div class="card" style="background:var(--surface-alt);padding:8px;font-size:0.82rem;">✨ ${esc(e.summary)}</div>` : ''}
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function renderInstructorDashboard(S) {
+      const criticalCount = state.emails.filter((e) => e.priority === 'CRITICAL' && !e.answered).length;
+      const pendingCount = state.emails.filter((e) => !e.answered).length;
+      const list = state.emails.filter((e) => {
+        const pf = state.emailFilter === 'ALL' || e.priority === state.emailFilter;
+        const q = state.emailSearch.trim().toLowerCase();
+        const sf = !q || (e.subject + e.sender + e.code + e.body).toLowerCase().includes(q);
+        return pf && sf;
+      });
+
+      return `
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div class="grid-2">
+            <div class="card" style="background:var(--primary);color:var(--on-primary);">
+              <div style="font-size:0.82rem;opacity:0.88;">Unanswered Inquiries</div>
+              <div style="font-size:1.65rem;font-weight:800;">${pendingCount}</div>
+            </div>
+            <div class="card">
+              <div class="muted">Critical Priority</div>
+              <div style="font-size:1.65rem;font-weight:800;color:#9E2A3B;">${criticalCount}</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="between">
+              <strong>🔁 ${esc(S.repeatedQ)}</strong>
+              <button id="btnGroupQuestions" type="button" class="btn btn-primary btn-sm">${esc(S.groupBtn)}</button>
+            </div>
+            ${state.clusters.length ? state.clusters.map((cl, idx) => `
+              <div class="card" style="margin-top:8px;background:var(--surface-alt);">
+                <div style="font-weight:700;">${esc(cl.code)} · ${esc(cl.topic)} (${cl.count})</div>
+                <div class="muted" style="margin:4px 0;">${esc(cl.suggested)}</div>
+                <button type="button" class="btn btn-primary btn-sm" data-send-unified="${idx}">${esc(S.unifiedReply)}</button>
+              </div>
+            `).join('') : ''}
+          </div>
+
+          <div class="row">
+            <input id="instEmailSearch" class="input" style="flex:1;min-width:180px;" placeholder="Search..." value="${esc(state.emailSearch)}" />
+            ${['ALL','CRITICAL','HIGH','NORMAL','LOW'].map((p) => `
+              <button type="button" class="pill ${state.emailFilter === p ? 'active' : ''}" data-email-filter="${p}">${p}</button>
+            `).join('')}
+          </div>
+
+          ${list.map((e) => `
+            <div class="card">
+              <div class="between">
+                <div><span class="prio-badge prio-${e.priority}">${e.priority}</span> <strong>${esc(e.code)} · ${esc(e.subject)}</strong></div>
+                <span class="muted">${esc(e.sender)}</span>
+              </div>
+              <p style="margin:8px 0 0;">${esc(e.body)}</p>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function renderInstructorMaterials(S) {
+      return `
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div class="card">
+            <h3 style="margin:0 0 10px;">☁️ ${esc(S.publishMat)}</h3>
+            <div class="grid-2">
+              <input id="matCode" class="input" placeholder="Course Code (M251)" />
+              <input id="matTitle" class="input" placeholder="Material Title" />
+            </div>
+            <input id="matLink" class="input" style="margin-top:8px;" placeholder="Optional URL (LMS / Slides)" />
+            <div class="between" style="margin-top:8px;">
+              <label class="btn btn-outline btn-sm" style="cursor:pointer;">
+                📎 ${esc(S.attach)}
+                <input id="matFile" type="file" class="hidden" />
+              </label>
+              <button id="btnPublishMat" type="button" class="btn btn-primary btn-sm">${esc(S.publishMat)}</button>
+            </div>
+            <div id="matFileName" class="muted" style="font-size:0.78rem;margin-top:4px;"></div>
+          </div>
+
+          ${state.materials.map((m) => `
+            <div class="card">
+              <div class="between">
+                <strong>${esc(m.code)} · ${esc(m.title)}</strong>
+                ${m.link ? `<a href="${esc(m.link)}" target="_blank" rel="noopener" class="btn btn-outline btn-sm">${esc(S.open)}</a>` : ''}
+              </div>
+              <div class="muted" style="margin-top:4px;">${esc(m.desc)} ${m.attachment ? `· 📎 ${esc(m.attachment)}` : ''}</div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function renderPomodoro(S) {
+      const mm = String(Math.floor(state.pomodoroSecondsLeft / 60)).padStart(2, '0');
+      const ss = String(state.pomodoroSecondsLeft % 60).padStart(2, '0');
+      const avatarFace = state.pomodoroCompanion === 'girl' ? '👩‍🎓' : '👨‍🎓';
+      return `
+        <div class="card" style="text-align:center;padding:24px 16px;">
+          <div class="companion-bob" style="font-size:3.6rem;">${avatarFace}</div>
+          <h2 style="margin:6px 0;">${esc(S.focusMode)}</h2>
+          <div id="pomoClock" style="font-size:3rem;font-weight:800;letter-spacing:1px;margin:10px 0;">${mm}:${ss}</div>
+          ${!state.pomodoroRunning ? `
+            <div class="row" style="justify-content:center;margin-bottom:14px;">
+              <button type="button" class="pill ${state.pomodoroCompanion === 'girl' ? 'active' : ''}" data-comp="girl">${esc(S.girlComp)}</button>
+              <button type="button" class="pill ${state.pomodoroCompanion === 'boy' ? 'active' : ''}" data-comp="boy">${esc(S.boyComp)}</button>
+            </div>
+            <div class="row" style="justify-content:center;margin-bottom:14px;">
+              ${[25, 45, 50].map((m) => `<button type="button" class="pill ${state.pomodoroMinutes === m ? 'active' : ''}" data-pomo-min="${m}">${m}m</button>`).join('')}
+            </div>
+            <div class="row" style="justify-content:center;">
+              <button id="btnPomoStart" type="button" class="btn btn-primary">${esc(S.startFocus)}</button>
+              <button id="btnPomoReset" type="button" class="btn btn-outline">${esc(S.reset)}</button>
+            </div>
+          ` : `
+            <div class="card" style="background:var(--surface-alt);margin:10px auto;max-width:340px;">
+              🔒 ${esc(S.focusLocked)}
+            </div>
+          `}
+        </div>
+      `;
+    }
+
+    function renderStudyHub(S) {
+      return `
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div class="card">
+            <h3 style="margin:0 0 4px;">📖 ${esc(S.bookAssistant)}</h3>
+            <div class="muted" style="margin-bottom:10px;">${esc(S.bookHint)}</div>
+            <div class="row" style="margin-bottom:10px;">
+              ${state.books.map((b) => `<span class="pill">📘 ${esc(b.title)}</span>`).join('')}
+            </div>
+            <div class="grid-2" style="margin-bottom:10px;">
+              <input id="newBookTitle" class="input" placeholder="${esc(S.addBook)}" />
+              <input id="newBookText" class="input" placeholder="Paste key chapter excerpt..." />
+            </div>
+            <button id="btnAddBook" type="button" class="btn btn-outline btn-sm" style="margin-bottom:12px;">+ ${esc(S.addBook)}</button>
+
+            <div class="row">
+              <input id="bookAskInput" class="input" style="flex:1;" placeholder="${esc(S.askBook)}" />
+              <button id="btnAskBook" type="button" class="btn btn-primary">${esc(S.send)}</button>
+            </div>
+            ${state.bookMessages.map((msg) => `
+              <div class="card" style="margin-top:8px;background:${msg.me ? 'var(--bg)' : 'var(--surface-alt)'};padding:10px;">
+                <strong>${msg.me ? 'You' : 'UniSync'}:</strong> ${esc(msg.text)}
+              </div>
+            `).join('')}
+          </div>
+
+          <div class="card">
+            <h3 style="margin:0 0 8px;">🎙️ ${esc(S.voiceNotes)} & 📝 ${esc(S.forum)}</h3>
+            <div class="grid-2" style="margin-bottom:10px;">
+              <input id="forumTitle" class="input" placeholder="Forum post title..." />
+              <input id="forumBody" class="input" placeholder="Question or study note..." />
+            </div>
+            <div class="between" style="margin-bottom:10px;">
+              <label class="btn btn-outline btn-sm" style="cursor:pointer;">
+                📎 ${esc(S.attach)}
+                <input id="forumFile" type="file" class="hidden" />
+              </label>
+              <button id="btnPostForum" type="button" class="btn btn-primary btn-sm">${esc(S.send)}</button>
+            </div>
+            ${state.forumPosts.map((p) => `
+              <div class="card" style="margin-top:8px;background:var(--bg);">
+                <strong>${esc(p.title)}</strong> <span class="muted">· ${esc(p.author)}</span>
+                <p style="margin:4px 0;">${esc(p.body)}</p>
+                ${p.attachment ? `<div class="muted">📎 ${esc(p.attachment)}</div>` : ''}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderRoadmapScreen(S) {
+      const major = MAJORS.find((m) => m.id === state.majorId) || MAJORS[0];
+      const stagesMap = {};
+      major.courses.forEach((cr) => {
+        (stagesMap[cr.stage] = stagesMap[cr.stage] || []).push(cr);
+      });
+      const stageKeys = Object.keys(stagesMap).map(Number).sort((a, b) => a - b);
+
+      const nodeW = 184, nodeH = 104, colGap = 76, rowGap = 24, pad = 20, headerBand = 42;
+      const layouts = [];
+      const byCode = {};
+      let maxRows = 1;
+
+      stageKeys.forEach((stNum, colIdx) => {
+        const list = stagesMap[stNum];
+        if (list.length > maxRows) maxRows = list.length;
+        const x = pad + colIdx * (nodeW + colGap);
+        list.forEach((course, rowIdx) => {
+          const y = pad + headerBand + rowIdx * (nodeH + rowGap);
+          const item = { course, stageIdx: colIdx, rowIdx, x, y };
+          layouts.push(item);
+          byCode[course.code] = item;
+        });
+      });
+
+      const boardW = pad * 2 + stageKeys.length * nodeW + Math.max(0, stageKeys.length - 1) * colGap;
+      const boardH = pad * 2 + headerBand + maxRows * nodeH + Math.max(0, maxRows - 1) * rowGap;
+      const categories = [...new Set(major.courses.map((cr) => cr.category))];
+
+      const completedCredits = major.courses
+        .filter((cr) => (state.courseStatuses[`${major.id}:${cr.code}`] || 'NOT_STARTED') === 'COMPLETED')
+        .reduce((acc, cr) => acc + cr.credits, 0);
+
+      // Build clean SVG cubic curves for prerequisites
+      const paths = [];
+      layouts.forEach((target) => {
+        target.course.prereq.forEach((pCode, idx) => {
+          const src = byCode[pCode];
+          if (!src) return;
+          const x1 = src.x + nodeW;
+          const y1 = src.y + nodeH * 0.5;
+          const x2 = target.x - 4;
+          const y2 = target.y + nodeH * 0.5 + ((idx % 3) - 1) * 8;
+          const cx = src.stageIdx < target.stageIdx ? x1 + (x2 - x1) * 0.48 : x1 + 28;
+          paths.push(`<path d="M ${x1} ${y1} C ${cx} ${y1}, ${cx} ${y2}, ${x2} ${y2}" fill="none" stroke="var(--primary)" stroke-opacity="0.48" stroke-width="2" marker-end="url(#arrowHead)" />`);
+        });
+      });
+
+      const zoomScale = zoomPercentToScale(state.roadmapZoom, boardW);
+
+      return `
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="between">
+            <div>
+              <h2 style="margin:0;font-size:1.12rem;">🗺️ ${esc(S.roadmapTitle)}</h2>
+              <div id="zoomPercentText" class="muted" style="font-weight:700;color:var(--primary);">${esc(S.zoom)}: ${Math.round(state.roadmapZoom)}%</div>
+            </div>
+            <div class="row" style="gap:6px;">
+              <button id="zoomZeroBtn" type="button" class="btn btn-outline btn-sm">0%</button>
+              <button id="zoomOutBtn" type="button" class="btn btn-outline btn-sm">−</button>
+              <button id="zoomInBtn" type="button" class="btn btn-outline btn-sm">+</button>
+              <button id="zoomResetBtn" type="button" class="btn btn-outline btn-sm">↺</button>
+            </div>
+          </div>
+
+          <input id="zoomSlider" type="range" min="0" max="200" value="${Math.round(state.roadmapZoom)}" style="width:100%;" />
+
+          <div class="row" style="overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px;">
+            ${MAJORS.map((m) => `<button type="button" class="pill ${m.id === major.id ? 'active' : ''}" style="white-space:nowrap;" data-major-chip="${m.id}">${esc(m.name)}</button>`).join('')}
+          </div>
+
+          <div class="card" style="padding:10px 12px;">
+            <div class="between" style="font-size:0.84rem;font-weight:700;">
+              <span>${esc(S.statusCompleted)}: ${completedCredits}/${major.totalCredits} ${esc(S.credits)}</span>
+              <span>${Math.round((completedCredits / major.totalCredits) * 100)}%</span>
+            </div>
+            <div class="row" style="margin-top:8px;gap:6px;">
+              ${categories.map((cat) => `
+                <span class="pill" style="padding:3px 10px;font-size:0.76rem;border-color:${catColor(cat)};color:${catColor(cat)};">
+                  <span style="width:8px;height:8px;border-radius:50%;background:${catColor(cat)};display:inline-block;"></span>
+                  ${esc(catLabel(cat, S))}
+                </span>
+              `).join('')}
+            </div>
+          </div>
+
+          <div id="roadmapViewport" class="roadmap-viewport">
+            <div id="roadmapBoard" class="roadmap-board" style="width:${boardW}px;height:${boardH}px;transform:translate(${state.roadmapPanX}px, ${state.roadmapPanY}px) scale(${zoomScale});">
+              <svg width="${boardW}" height="${boardH}" style="position:absolute;inset:0;pointer-events:none;">
+                <defs>
+                  <marker id="arrowHead" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                    <path d="M0,0 L0,6 L6,3 z" fill="var(--primary)" fill-opacity="0.7" />
+                  </marker>
+                </defs>
+                ${paths.join('')}
+              </svg>
+
+              ${stageKeys.map((stNum, idx) => `
+                <div class="roadmap-stage-pill" style="left:${pad + idx * (nodeW + colGap)}px;top:${pad}px;">${esc(S.stage)} ${stNum}</div>
+              `).join('')}
+
+              ${layouts.map(({ course, x, y }) => {
+                const st = state.courseStatuses[`${major.id}:${course.code}`] || 'NOT_STARTED';
+                const cCol = catColor(course.category);
+                const sCol = statusColor(st);
+                return `
+                  <button type="button" class="roadmap-node" data-course-node="${course.code}"
+                    style="left:${x}px;top:${y}px;border-color:${st !== 'NOT_STARTED' ? sCol : cCol};">
+                    <div class="roadmap-node-head" style="background:${cCol};">
+                      <span>${esc(course.code)}</span>
+                      <span>${course.credits}${esc(S.credits)} ▾</span>
+                    </div>
+                    <div class="roadmap-node-body">
+                      <div class="roadmap-node-title">${esc(course.title)}</div>
+                      <div class="between" style="font-size:10.5px;color:var(--text-sec);">
+                        <span>🔓 ${course.prereq.length ? esc(course.prereq.join(',')) : '—'}</span>
+                        <span style="font-weight:700;color:${sCol};">${st !== 'NOT_STARTED' ? esc(statusLabel(st, S)) : ''}</span>
+                      </div>
+                    </div>
+                  </button>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function zoomPercentToScale(pct, boardW) {
+      const vpW = Math.max(300, Math.min(1040, window.innerWidth - 36));
+      const fit = Math.max(0.24, Math.min(0.78, (vpW - 16) / boardW));
+      const p = Math.max(0, Math.min(200, pct));
+      return p <= 100 ? fit + (p / 100) * (1 - fit) : 1 + ((p - 100) / 100) * 0.8;
+    }
+
+    function renderCourseDetailModal(S) {
+      const major = MAJORS.find((m) => m.id === state.majorId) || MAJORS[0];
+      const course = major.courses.find((cr) => cr.code === state.roadmapInspectCode);
+      if (!course) return '';
+      const st = state.courseStatuses[`${major.id}:${course.code}`] || 'NOT_STARTED';
+      const unlocked = major.courses.filter((cr) => cr.prereq.includes(course.code));
+
+      return `
+        <div id="courseModalBackdrop" class="modal-backdrop">
+          <div class="modal-card">
+            <div class="row" style="margin-bottom:8px;">
+              <span class="pill" style="background:${catColor(course.category)};color:#F8FAFE;border:none;">${esc(course.code)}</span>
+              <span class="pill" style="color:${catColor(course.category)};border-color:${catColor(course.category)};">${esc(catLabel(course.category, S))}</span>
+              <span class="muted">${esc(S.stage)} ${course.stage} · ${course.credits} ${esc(S.credits)}</span>
+            </div>
+            <h3 style="margin:0 0 12px;">${esc(course.title)}</h3>
+
+            <div style="font-weight:700;font-size:0.86rem;margin-bottom:6px;">${esc(S.courseStatus)}</div>
+            <div class="row" style="margin-bottom:14px;">
+              ${['COMPLETED','IN_PROGRESS','NEXT_TERM','NOT_STARTED'].map((key) => `
+                <button type="button" class="pill ${st === key ? 'active' : ''}" data-set-course-status="${key}">${esc(statusLabel(key, S))}</button>
+              `).join('')}
+            </div>
+
+            <div style="font-weight:700;font-size:0.86rem;margin-bottom:6px;">${esc(S.prereq)}</div>
+            <div class="row" style="margin-bottom:12px;">
+              ${course.prereq.length ? course.prereq.map((pCode) => {
+                const match = major.courses.find((m) => m.code === pCode);
+                return `<button type="button" class="pill" data-jump-course="${pCode}">${esc(pCode)}${match ? ` · ${esc(match.title)}` : ''}</button>`;
+              }).join('') : `<span class="muted">${esc(S.noPrereq)}</span>`}
+            </div>
+
+            ${unlocked.length ? `
+              <div style="font-weight:700;font-size:0.86rem;margin-bottom:6px;">${esc(S.unlocks)}</div>
+              <div class="row" style="margin-bottom:14px;">
+                ${unlocked.map((nx) => `<button type="button" class="pill" data-jump-course="${nx.code}">${esc(nx.code)} · ${esc(nx.title)}</button>`).join('')}
+              </div>
+            ` : ''}
+
+            <div style="text-align:end;">
+              <button id="closeCourseModalBtn" type="button" class="btn btn-primary">${esc(S.done)}</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderGpaScreen(S) {
+      const termCr = state.gpaCourses.reduce((a, b) => a + b.credits, 0);
+      const termPts = state.gpaCourses.reduce((a, b) => a + b.credits * b.pts, 0);
+      const termGpa = termCr > 0 ? termPts / termCr : 0;
+
+      const prevGpa = Math.max(0, Math.min(4, parseFloat(state.priorGpa) || 0));
+      const prevCr = Math.max(0, parseInt(state.priorCredits, 10) || 0);
+      const totalCr = prevCr + termCr;
+      const cumGpa = totalCr > 0 ? (prevGpa * prevCr + termPts) / totalCr : 0;
+
+      return `
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div class="between">
+            <h2 style="margin:0;font-size:1.15rem;">🧮 ${esc(S.gpaTitle)}</h2>
+            <button id="btnClearGpa" type="button" class="btn btn-outline btn-sm">${esc(S.clearAll)}</button>
+          </div>
+
+          <div class="card" style="background:var(--primary);color:var(--on-primary);">
+            <div class="between">
+              <div>
+                <div style="font-size:0.8rem;opacity:0.88;">${esc(S.semGpa)}</div>
+                <div id="semGpaVal" style="font-size:1.8rem;font-weight:800;">${termGpa.toFixed(2)}</div>
+                <div style="font-size:0.78rem;opacity:0.85;">${termCr} ${esc(S.credits)}</div>
+              </div>
+              <div style="text-align:end;">
+                <div style="font-size:0.8rem;opacity:0.88;">${esc(S.cumGpa)}</div>
+                <div id="cumGpaVal" style="font-size:1.8rem;font-weight:800;">${cumGpa.toFixed(2)}</div>
+                <div style="font-size:0.78rem;opacity:0.85;">${totalCr} ${esc(S.credits)}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div style="font-weight:700;margin-bottom:8px;">${esc(S.priorRecord)}</div>
+            <div class="grid-2">
+              <input id="priorGpaInput" type="number" step="0.01" min="0" max="4" class="input" placeholder="${esc(S.priorGpa)}" value="${esc(state.priorGpa)}" />
+              <input id="priorCreditsInput" type="number" min="0" class="input" placeholder="${esc(S.priorCredits)}" value="${esc(state.priorCredits)}" />
+            </div>
+          </div>
+
+          <div class="card">
+            <div style="font-weight:700;margin-bottom:8px;">${esc(S.addCourse)}</div>
+            <div class="grid-2" style="margin-bottom:8px;">
+              <input id="gpaCourseCode" class="input" placeholder="${esc(S.courseCodePh)}" />
+              <select id="gpaCreditSelect" class="select">
+                ${[1,2,3,4,8].map((cr) => `<option value="${cr}" ${cr === 3 ? 'selected' : ''}>${cr} ${esc(S.credits)}</option>`).join('')}
+              </select>
+            </div>
+            <select id="gpaGradeSelect" class="select" style="margin-bottom:10px;">
+              ${SIS_GRADES.map((g) => `<option value="${g.label}">${g.label} (${g.pts.toFixed(1)})</option>`).join('')}
+            </select>
+            <button id="btnAddGpaCourse" type="button" class="btn btn-primary" style="width:100%;">+ ${esc(S.addCourse)}</button>
+          </div>
+
+          ${state.gpaCourses.map((g) => `
+            <div class="card between">
+              <div>
+                <strong>${esc(g.code)}</strong>
+                <div class="muted">${g.credits} ${esc(S.credits)} · ${esc(S.gradeLabel)}: ${esc(g.grade)} (${g.pts.toFixed(2)})</div>
+              </div>
+              <button type="button" class="btn btn-outline btn-sm" data-del-gpa="${g.id}">🗑️</button>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function renderPortalsScreen(S) {
+      const bp = AOU_BRANCHES.find((b) => b.name === state.branch) || AOU_BRANCHES[0];
+      return `
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <h2 style="margin:0;font-size:1.15rem;">🌐 ${esc(S.portalsTitle)}</h2>
+          <div class="row" style="overflow-x:auto;flex-wrap:nowrap;">
+            ${AOU_BRANCHES.map((b) => `<button type="button" class="pill ${b.name === bp.name ? 'active' : ''}" style="white-space:nowrap;" data-portal-branch="${b.name}">${esc(b.name)}</button>`).join('')}
+          </div>
+          ${[
+            { title: 'SIS · Student Information System', sub: `${bp.country} — Registration & Grades`, url: bp.sis },
+            { title: 'LMS · Learning Management System', sub: `${bp.country} — Lectures & TMAs`, url: bp.lms },
+            { title: 'Admissions Portal', sub: `${bp.country} — Registration & Programs`, url: bp.adm }
+          ].map((p) => `
+            <div class="card between">
+              <div>
+                <strong>${esc(p.title)}</strong>
+                <div class="muted">${esc(p.sub)}</div>
+                <div class="muted" style="font-size:0.78rem;">${esc(p.url)}</div>
+              </div>
+              <a href="${esc(p.url)}" target="_blank" rel="noopener" class="btn btn-primary btn-sm">${esc(S.open)}</a>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function renderSupportContent(S) {
+      const depts = ['All', 'Student Affairs', 'IT Department', 'Admission & Registration', 'Financial Department', 'Faculties & Units', 'Technical Support'];
+      const filtered = SUPPORT_CONTACTS.filter((ct) => state.supportDept === 'All' || ct.dept === state.supportDept);
+      return `
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="row" style="overflow-x:auto;flex-wrap:nowrap;">
+            ${depts.map((d) => `<button type="button" class="pill ${state.supportDept === d ? 'active' : ''}" style="white-space:nowrap;" data-support-dept="${d}">${esc(d === 'All' ? S.all : d)}</button>`).join('')}
+          </div>
+          ${filtered.map((ct) => `
+            <div class="card between">
+              <div>
+                <strong>${esc(ct.dept)}</strong> · <span class="muted">${esc(ct.branch)}</span>
+                <div>${esc(ct.topic)}</div>
+                <div class="muted">${esc(ct.email)}</div>
+              </div>
+              <a href="mailto:${esc(ct.email)}" class="btn btn-primary btn-sm">✉️ Email</a>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function renderSupportScreen(S) {
+      return `<div><h2 style="margin:0 0 12px;font-size:1.15rem;">🎧 ${esc(S.supportTitle)}</h2>${renderSupportContent(S)}</div>`;
+    }
+
+    function renderSupportModal(S) {
+      return `
+        <div id="supportModalBackdrop" class="modal-backdrop">
+          <div class="modal-card">
+            <div class="between" style="margin-bottom:10px;">
+              <h3 style="margin:0;">🎧 ${esc(S.supportTitle)}</h3>
+              <button id="closeSupportModalBtn" type="button" class="btn btn-outline btn-sm">${esc(S.close)}</button>
+            </div>
+            ${renderSupportContent(S)}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderDownloadsModal(S) {
+      const url = window.location.href;
+      const items = [
+        { title: 'App Store (iOS / iPadOS)', guide: 'Open in Safari → tap Share → Add to Home Screen.' },
+        { title: 'Google Play / Android', guide: 'Open in Chrome → tap Install App / Add to Home Screen.' },
+        { title: 'Windows (10 / 11)', guide: 'Open in Edge or Chrome → click Install UniSync in address bar.' },
+        { title: 'macOS', guide: 'Open in Safari → File → Add to Dock.' }
+      ];
+      return `
+        <div id="downloadsModalBackdrop" class="modal-backdrop">
+          <div class="modal-card">
+            <div class="between" style="margin-bottom:10px;">
+              <h3 style="margin:0;">📲 UniSync Apps</h3>
+              <button id="closeDownloadsModalBtn" type="button" class="btn btn-outline btn-sm">${esc(S.close)}</button>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              ${items.map((it) => `
+                <div class="card" style="background:var(--bg);">
+                  <strong>${esc(it.title)}</strong>
+                  <div class="muted">${esc(it.guide)}</div>
+                </div>
+              `).join('')}
+              <button id="copyAppUrlBtn" type="button" class="btn btn-primary" data-url="${esc(url)}">📋 Copy App Link</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderCalendarScreen(S) {
+      return `
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div class="between">
+            <h2 style="margin:0;font-size:1.15rem;">📅 ${esc(S.calendar)}</h2>
+          </div>
+          <div class="card">
+            <div class="grid-2">
+              <input id="evCode" class="input" placeholder="Course Code (M251)" />
+              <input id="evTitle" class="input" placeholder="Event / Alarm Title" />
+            </div>
+            <div class="row" style="margin-top:8px;">
+              <select id="evRingtone" class="select" style="flex:1;">
+                ${RINGTONES.map((r) => `<option value="${r.id}">${esc(S.ringtone)}: ${esc(r.name)}</option>`).join('')}
+              </select>
+              <button id="btnAddEvent" type="button" class="btn btn-primary btn-sm">+ ${esc(S.addEvent)}</button>
+            </div>
+          </div>
+          ${state.events.map((ev) => `
+            <div class="card between">
+              <div>
+                <strong>${esc(ev.code)} · ${esc(ev.title)}</strong>
+                <div class="muted">🔔 ${esc((RINGTONES.find((r) => r.id === ev.ringtone) || RINGTONES[0]).name)} · ${formatCountdown(ev.ts)}</div>
+              </div>
+              <button type="button" class="btn btn-outline btn-sm" data-test-alarm="${ev.id}">🔔 ${esc(S.testAlarm)}</button>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function renderChatScreen(S) {
+      return `
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <h2 style="margin:0;font-size:1.15rem;">💬 ${esc(S.chat)}</h2>
+          <div class="card">
+            <div class="row">
+              <input id="chatInput" class="input" style="flex:1;" placeholder="Write a message..." />
+              <label class="btn btn-outline btn-sm" style="cursor:pointer;">
+                📎
+                <input id="chatFile" type="file" class="hidden" />
+              </label>
+              <button id="btnSendChat" type="button" class="btn btn-primary btn-sm">${esc(S.send)}</button>
+            </div>
+          </div>
+          ${state.chats.map((ch) => `
+            <div class="card">
+              <strong>${esc(ch.author)}</strong>
+              <p style="margin:4px 0 0;">${esc(ch.text)}</p>
+              ${ch.attachment ? `<div class="muted">📎 ${esc(ch.attachment)}</div>` : ''}
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function renderAlarmOverlay(S) {
+      return `
+        <div class="modal-backdrop">
+          <div class="modal-card" style="text-align:center;">
+            <div style="font-size:2.6rem;">🔔</div>
+            <h2 style="margin:6px 0;">${esc(state.activeAlarm.code)} · ${esc(state.activeAlarm.title)}</h2>
+            <p class="muted">UniSync Smart Alarm</p>
+            <button id="dismissAlarmBtn" type="button" class="btn btn-primary" style="width:100%;">${esc(S.done)}</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function bindAuthEvents(S) {
+      document.getElementById('authSupportBtn')?.addEventListener('click', () => {
+        state.showSupportModal = true;
+        render();
+      });
+      document.getElementById('authLangSelect')?.addEventListener('change', (e) => {
+        state.language = e.target.value;
+        saveState();
+        render();
+      });
+      document.querySelectorAll('[data-role]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          state.role = btn.getAttribute('data-role');
+          saveState();
+          render();
+        });
+      });
+      document.getElementById('btnDemoEntry')?.addEventListener('click', () => {
+        state.loggedIn = true;
+        state.authProvider = 'demo';
+        saveState();
+        render();
+      });
+      document.getElementById('btnGoogleSignIn')?.addEventListener('click', () => {
+        state.loggedIn = true;
+        state.authProvider = 'google_local';
+        saveState();
+        render();
+      });
+      document.getElementById('btnMicrosoftSignIn')?.addEventListener('click', () => {
+        const redirect = encodeURIComponent(window.location.origin + window.location.pathname);
+        const url = `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=${MICROSOFT_ENTRA_CLIENT_ID}&response_type=token&redirect_uri=${redirect}&scope=openid%20profile%20email`;
+        const notice = document.getElementById('authNotice');
+        if (notice) notice.textContent = `Microsoft Entra ID (${MICROSOFT_ENTRA_CLIENT_ID.slice(0, 8)}…)`;
+        window.open(url, '_blank', 'noopener');
+        state.loggedIn = true;
+        state.authProvider = 'microsoft';
+        saveState();
+        render();
+      });
+      document.getElementById('btnOpenDownloads')?.addEventListener('click', () => {
+        state.showDownloadsModal = true;
+        render();
+      });
+      bindSharedModalEvents();
+    }
+
+    function bindSharedModalEvents() {
+      document.getElementById('closeSupportModalBtn')?.addEventListener('click', () => {
+        state.showSupportModal = false;
+        render();
+      });
+      document.getElementById('supportModalBackdrop')?.addEventListener('click', (e) => {
+        if (e.target.id === 'supportModalBackdrop') { state.showSupportModal = false; render(); }
+      });
+      document.querySelectorAll('[data-support-dept]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          state.supportDept = btn.getAttribute('data-support-dept');
+          render();
+        });
+      });
+      document.getElementById('closeDownloadsModalBtn')?.addEventListener('click', () => {
+        state.showDownloadsModal = false;
+        render();
+      });
+      document.getElementById('downloadsModalBackdrop')?.addEventListener('click', (e) => {
+        if (e.target.id === 'downloadsModalBackdrop') { state.showDownloadsModal = false; render(); }
+      });
+      document.getElementById('copyAppUrlBtn')?.addEventListener('click', (e) => {
+        const u = e.currentTarget.getAttribute('data-url');
+        navigator.clipboard?.writeText(u).catch(() => {});
+        e.currentTarget.textContent = '✓ Copied';
+      });
+    }
+
+    function bindWorkspaceEvents(S) {
+      document.getElementById('openDrawerBtn')?.addEventListener('click', () => {
+        if (state.pomodoroRunning) return;
+        state.drawerOpen = true;
+        state.drawerSettingsTab = false;
+        render();
+      });
+      document.getElementById('openAccountDrawerBtn')?.addEventListener('click', () => {
+        if (state.pomodoroRunning) return;
+        state.drawerOpen = true;
+        state.drawerSettingsTab = true;
+        render();
+      });
+      document.getElementById('topThemeToggle')?.addEventListener('click', () => {
+        state.darkMode = !state.darkMode;
+        saveState();
+        render();
+      });
+      document.querySelectorAll('[data-nav]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const target = btn.getAttribute('data-nav');
+          if (state.pomodoroRunning && target !== 'pomodoro') return;
+          if (state.role === 'STUDENT') state.studentTab = target;
+          else state.instructorTab = target;
+          saveState();
+          render();
+        });
+      });
+
+      // Drawer events
+      document.getElementById('closeDrawerBtn')?.addEventListener('click', () => { state.drawerOpen = false; render(); });
+      document.getElementById('drawerBackdrop')?.addEventListener('click', (e) => {
+        if (e.target.id === 'drawerBackdrop') { state.drawerOpen = false; render(); }
+      });
+      document.getElementById('drawerTabNavBtn')?.addEventListener('click', () => { state.drawerSettingsTab = false; render(); });
+      document.getElementById('drawerTabSettingsBtn')?.addEventListener('click', () => { state.drawerSettingsTab = true; render(); });
+      document.getElementById('drawerGoSettingsLink')?.addEventListener('click', () => { state.drawerSettingsTab = true; render(); });
+      document.querySelectorAll('[data-drawer-nav]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const target = btn.getAttribute('data-drawer-nav');
+          if (state.role === 'STUDENT') state.studentTab = target;
+          else state.instructorTab = target;
+          state.drawerOpen = false;
+          saveState();
+          render();
+        });
+      });
+      document.querySelectorAll('[data-drawer-role]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          state.role = btn.getAttribute('data-drawer-role');
+          saveState();
+          render();
+        });
+      });
+      document.getElementById('drawerBranchSelect')?.addEventListener('change', (e) => {
+        state.branch = e.target.value;
+        saveState();
+        render();
+      });
+      document.getElementById('drawerMajorSelect')?.addEventListener('change', (e) => {
+        state.majorId = e.target.value;
+        saveState();
+        render();
+      });
+      document.getElementById('drawerLangSelect')?.addEventListener('change', (e) => {
+        state.language = e.target.value;
+        saveState();
+        render();
+      });
+      document.querySelectorAll('[data-font-scale]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          state.fontScale = parseFloat(btn.getAttribute('data-font-scale')) || 1;
+          saveState();
+          render();
+        });
+      });
+      document.getElementById('drawerDarkToggle')?.addEventListener('click', () => {
+        state.darkMode = !state.darkMode;
+        saveState();
+        render();
+      });
+      document.getElementById('drawerDownloadsBtn')?.addEventListener('click', () => {
+        state.drawerOpen = false;
+        state.showDownloadsModal = true;
+        render();
+      });
+      document.getElementById('drawerSignOutBtn')?.addEventListener('click', () => {
+        state.drawerOpen = false;
+        state.loggedIn = false;
+        saveState();
+        render();
+      });
+      document.getElementById('avatarUploadInput')?.addEventListener('change', (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          state.avatarDataUrl = String(reader.result || '');
+          saveState();
+          render();
+        };
+        reader.readAsDataURL(file);
+      });
+
+      // Inbox & Instructor events
+      document.querySelectorAll('[data-email-filter]').forEach((btn) => {
+        btn.addEventListener('click', () => { state.emailFilter = btn.getAttribute('data-email-filter'); render(); });
+      });
+      document.getElementById('instEmailSearch')?.addEventListener('input', (e) => {
+        state.emailSearch = e.target.value;
+        render();
+      });
+      document.getElementById('composeFile')?.addEventListener('change', (e) => {
+        const f = e.target.files?.[0];
+        const el = document.getElementById('composeFileName');
+        if (el && f) el.textContent = `📎 ${f.name}`;
+      });
+      document.getElementById('btnSendEmail')?.addEventListener('click', () => {
+        const to = document.getElementById('composeTo')?.value.trim() || 'AOU';
+        const sub = document.getElementById('composeSub')?.value.trim() || 'Inquiry';
+        const body = document.getElementById('composeBody')?.value.trim();
+        if (!body) return;
+        state.emails.unshift({ id: 'e' + Date.now(), sender: 'You', code: to, subject: sub, body, priority: 'NORMAL', answered: true, summary: '' });
+        saveState();
+        render();
+      });
+      document.getElementById('btnGroupQuestions')?.addEventListener('click', () => {
+        const unanswered = state.emails.filter((e) => !e.answered && e.priority !== 'LOW');
+        const byCode = {};
+        unanswered.forEach((e) => { (byCode[e.code] = byCode[e.code] || []).push(e); });
+        state.clusters = Object.entries(byCode)
+          .filter(([, arr]) => arr.length >= 2)
+          .map(([code, arr]) => ({
+            code,
+            topic: arr[0].subject,
+            count: arr.length,
+            suggested: `Dear ${code} students, regarding "${arr[0].subject}": please submit via LMS as PDF or ZIP.`
+          }));
+        saveState();
+        render();
+      });
+      document.querySelectorAll('[data-send-unified]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const idx = Number(btn.getAttribute('data-send-unified'));
+          const cl = state.clusters[idx];
+          if (!cl) return;
+          state.emails.forEach((e) => { if (e.code === cl.code && !e.answered) e.answered = true; });
+          state.clusters.splice(idx, 1);
+          saveState();
+          render();
+        });
+      });
+
+      // Materials
+      document.getElementById('matFile')?.addEventListener('change', (e) => {
+        const f = e.target.files?.[0];
+        const el = document.getElementById('matFileName');
+        if (el && f) el.textContent = `📎 ${f.name}`;
+      });
+      document.getElementById('btnPublishMat')?.addEventListener('click', () => {
+        const code = document.getElementById('matCode')?.value.trim() || 'M251';
+        const title = document.getElementById('matTitle')?.value.trim();
+        const link = document.getElementById('matLink')?.value.trim() || '';
+        const file = document.getElementById('matFile')?.files?.[0]?.name || '';
+        if (!title) return;
+        state.materials.unshift({ id: 'm' + Date.now(), code, title, desc: 'Published material', link, attachment: file });
+        saveState();
+        render();
+      });
+
+      // Pomodoro
+      document.querySelectorAll('[data-comp]').forEach((btn) => {
+        btn.addEventListener('click', () => { state.pomodoroCompanion = btn.getAttribute('data-comp'); saveState(); render(); });
+      });
+      document.querySelectorAll('[data-pomo-min]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const mins = Number(btn.getAttribute('data-pomo-min'));
+          state.pomodoroMinutes = mins;
+          state.pomodoroSecondsLeft = mins * 60;
+          saveState();
+          render();
+        });
+      });
+      document.getElementById('btnPomoStart')?.addEventListener('click', () => {
+        state.pomodoroRunning = true;
+        render();
+      });
+      document.getElementById('btnPomoReset')?.addEventListener('click', () => {
+        state.pomodoroRunning = false;
+        state.pomodoroSecondsLeft = state.pomodoroMinutes * 60;
+        render();
+      });
+
+      // Study Hub
+      document.getElementById('btnAddBook')?.addEventListener('click', () => {
+        const title = document.getElementById('newBookTitle')?.value.trim();
+        const content = document.getElementById('newBookText')?.value.trim();
+        if (!title || !content) return;
+        state.books.push({ id: 'b' + Date.now(), title, content });
+        saveState();
+        render();
+      });
+      document.getElementById('btnAskBook')?.addEventListener('click', () => {
+        const q = document.getElementById('bookAskInput')?.value.trim();
+        if (!q) return;
+        state.bookMessages.push({ me: true, text: q }, { me: false, text: answerFromBooksOnly(q) });
+        saveState();
+        render();
+      });
+      document.getElementById('btnPostForum')?.addEventListener('click', () => {
+        const title = document.getElementById('forumTitle')?.value.trim();
+        const body = document.getElementById('forumBody')?.value.trim();
+        const att = document.getElementById('forumFile')?.files?.[0]?.name || '';
+        if (!title || !body) return;
+        state.forumPosts.unshift({ id: 'f' + Date.now(), author: 'AOU Student', category: 'General', title, body, attachment: att, replies: [] });
+        saveState();
+        render();
+      });
+
+      // GPA Calculator
+      document.getElementById('priorGpaInput')?.addEventListener('input', (e) => {
+        state.priorGpa = e.target.value;
+        saveState();
+        render();
+      });
+      document.getElementById('priorCreditsInput')?.addEventListener('input', (e) => {
+        state.priorCredits = e.target.value;
+        saveState();
+        render();
+      });
+      document.getElementById('btnAddGpaCourse')?.addEventListener('click', () => {
+        const code = document.getElementById('gpaCourseCode')?.value.trim().toUpperCase() || `COURSE ${state.gpaCourses.length + 1}`;
+        const credits = Number(document.getElementById('gpaCreditSelect')?.value || 3);
+        const gradeLabel = document.getElementById('gpaGradeSelect')?.value || 'A';
+        const gObj = SIS_GRADES.find((g) => g.label === gradeLabel) || SIS_GRADES[0];
+        state.gpaCourses.push({ id: 'g' + Date.now(), code, credits, grade: gObj.label, pts: gObj.pts });
+        saveState();
+        render();
+      });
+      document.getElementById('btnClearGpa')?.addEventListener('click', () => {
+        state.gpaCourses = [];
+        state.priorGpa = '';
+        state.priorCredits = '';
+        saveState();
+        render();
+      });
+      document.querySelectorAll('[data-del-gpa]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const id = btn.getAttribute('data-del-gpa');
+          state.gpaCourses = state.gpaCourses.filter((g) => g.id !== id);
+          saveState();
+          render();
+        });
+      });
+
+      // Portals
+      document.querySelectorAll('[data-portal-branch]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          state.branch = btn.getAttribute('data-portal-branch');
+          saveState();
+          render();
+        });
+      });
+
+      // Calendar & Alarm
+      document.getElementById('btnAddEvent')?.addEventListener('click', () => {
+        const code = document.getElementById('evCode')?.value.trim().toUpperCase() || 'AOU';
+        const title = document.getElementById('evTitle')?.value.trim() || 'Academic Reminder';
+        const ringtone = document.getElementById('evRingtone')?.value || 'chime';
+        state.events.push({ id: 'ev' + Date.now(), code, title, ts: Date.now() + 3600 * 1000 * 4, ringtone });
+        saveState();
+        render();
+      });
+      document.querySelectorAll('[data-test-alarm]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const ev = state.events.find((e) => e.id === btn.getAttribute('data-test-alarm'));
+          if (!ev) return;
+          state.activeAlarm = ev;
+          playRingtone(ev.ringtone);
+          render();
+        });
+      });
+      document.getElementById('dismissAlarmBtn')?.addEventListener('click', () => {
+        state.activeAlarm = null;
+        render();
+      });
+
+      // Chat
+      document.getElementById('btnSendChat')?.addEventListener('click', () => {
+        const text = document.getElementById('chatInput')?.value.trim();
+        const att = document.getElementById('chatFile')?.files?.[0]?.name || '';
+        if (!text && !att) return;
+        state.chats.unshift({ id: 'c' + Date.now(), author: state.role === 'INSTRUCTOR' ? 'Instructor' : 'Student', text: text || 'Attachment', attachment: att });
+        saveState();
+        render();
+      });
+
+      // Visual Roadmap Zoom, Pan & Course Detail
+      bindRoadmapEvents();
+      bindSharedModalEvents();
+    }
+
+    function bindRoadmapEvents() {
+      const vp = document.getElementById('roadmapViewport');
+      const board = document.getElementById('roadmapBoard');
+      if (!vp || !board) return;
+
+      const boardW = parseFloat(board.style.width) || 1200;
+      const updateTransform = () => {
+        const scale = zoomPercentToScale(state.roadmapZoom, boardW);
+        board.style.transform = `translate(${state.roadmapPanX}px, ${state.roadmapPanY}px) scale(${scale})`;
+        const lbl = document.getElementById('zoomPercentText');
+        const S = t(state.language);
+        if (lbl) lbl.textContent = `${S.zoom}: ${Math.round(state.roadmapZoom)}%`;
+        const slider = document.getElementById('zoomSlider');
+        if (slider) slider.value = String(Math.round(state.roadmapZoom));
+      };
+
+      document.getElementById('zoomZeroBtn')?.addEventListener('click', () => {
+        state.roadmapZoom = 0; state.roadmapPanX = 0; state.roadmapPanY = 0;
+        saveState(); updateTransform();
+      });
+      document.getElementById('zoomOutBtn')?.addEventListener('click', () => {
+        state.roadmapZoom = Math.max(0, state.roadmapZoom - 15);
+        saveState(); updateTransform();
+      });
+      document.getElementById('zoomInBtn')?.addEventListener('click', () => {
+        state.roadmapZoom = Math.min(200, state.roadmapZoom + 15);
+        saveState(); updateTransform();
+      });
+      document.getElementById('zoomResetBtn')?.addEventListener('click', () => {
+        state.roadmapZoom = window.innerWidth < 600 ? 70 : 100;
+        state.roadmapPanX = 0; state.roadmapPanY = 0;
+        saveState(); updateTransform();
+      });
+      document.getElementById('zoomSlider')?.addEventListener('input', (e) => {
+        state.roadmapZoom = Math.max(0, Math.min(200, Number(e.target.value)));
+        saveState(); updateTransform();
+      });
+
+      let dragging = false, moved = false, startX = 0, startY = 0, basePanX = 0, basePanY = 0;
+      vp.addEventListener('pointerdown', (e) => {
+        if (e.target.closest('[data-course-node]')) return;
+        dragging = true; moved = false;
+        startX = e.clientX; startY = e.clientY;
+        basePanX = state.roadmapPanX; basePanY = state.roadmapPanY;
+        vp.setPointerCapture(e.pointerId);
+      });
+      vp.addEventListener('pointermove', (e) => {
+        if (!dragging) return;
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        if (Math.abs(dx) > 3 || Math.abs(dy) > 3) moved = true;
+        state.roadmapPanX = basePanX + dx;
+        state.roadmapPanY = basePanY + dy;
+        updateTransform();
+      });
+      vp.addEventListener('pointerup', () => { dragging = false; saveState(); });
+      vp.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        state.roadmapZoom = Math.max(0, Math.min(200, state.roadmapZoom - Math.sign(e.deltaY) * 10));
+        saveState(); updateTransform();
+      }, { passive: false });
+
+      document.querySelectorAll('[data-major-chip]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          state.majorId = btn.getAttribute('data-major-chip');
+          state.roadmapPanX = 0; state.roadmapPanY = 0;
+          saveState(); render();
+        });
+      });
+      document.querySelectorAll('[data-course-node]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          if (moved) return;
+          state.roadmapInspectCode = btn.getAttribute('data-course-node');
+          render();
+        });
+      });
+      document.getElementById('closeCourseModalBtn')?.addEventListener('click', () => {
+        state.roadmapInspectCode = null; render();
+      });
+      document.getElementById('courseModalBackdrop')?.addEventListener('click', (e) => {
+        if (e.target.id === 'courseModalBackdrop') { state.roadmapInspectCode = null; render(); }
+      });
+      document.querySelectorAll('[data-set-course-status]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const st = btn.getAttribute('data-set-course-status');
+          state.courseStatuses[`${state.majorId}:${state.roadmapInspectCode}`] = st;
+          saveState(); render();
+        });
+      });
+      document.querySelectorAll('[data-jump-course]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          state.roadmapInspectCode = btn.getAttribute('data-jump-course');
+          render();
+        });
+      });
+    }
+
+    // 1-second ticker for Pomodoro & Live Countdown
+    setInterval(() => {
+      if (state.loggedIn && state.pomodoroRunning) {
+        if (state.pomodoroSecondsLeft > 0) {
+          state.pomodoroSecondsLeft -= 1;
+          const clockEl = document.getElementById('pomoClock');
+          if (clockEl) {
+            const mm = String(Math.floor(state.pomodoroSecondsLeft / 60)).padStart(2, '0');
+            const ss = String(state.pomodoroSecondsLeft % 60).padStart(2, '0');
+            clockEl.textContent = `${mm}:${ss}`;
+          }
+        } else {
+          state.pomodoroRunning = false;
+          state.focusMinutesLogged += state.pomodoroMinutes;
+          state.pomodoroSecondsLeft = state.pomodoroMinutes * 60;
+          playRingtone('chime');
+          saveState();
+          render();
+        }
+      }
+      const cdEl = document.getElementById('liveCountdownValue');
+      if (cdEl && state.events.length) {
+        const nextEv = [...state.events].sort((a, b) => a.ts - b.ts)[0];
+        cdEl.textContent = formatCountdown(nextEv.ts);
+      }
+    }, 1000);
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
+
+    render();
+  })();
+  </script>
+</body>
+</html>
