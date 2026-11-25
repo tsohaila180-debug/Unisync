@@ -1,0 +1,308 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global default-deny safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidUserProfile(data) {
+      return data.userId is string && data.userId.size() >= 1 && data.userId.size() <= 128 &&
+             data.displayName is string && data.displayName.size() >= 1 && data.displayName.size() <= 80 &&
+             data.role in ['STUDENT', 'INSTRUCTOR'] &&
+             data.aouBranch is string && data.aouBranch.size() >= 1 && data.aouBranch.size() <= 60 &&
+             data.majorId is string && data.majorId.size() <= 40 &&
+             data.preferredLanguage is string && data.preferredLanguage.size() >= 2 && data.preferredLanguage.size() <= 5 &&
+             data.darkMode is bool &&
+             data.pomodoroCharacter in ['GIRL', 'BOY'] &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    function isValidInboxEmail(data) {
+      return data.userId is string && data.userId.size() >= 1 && data.userId.size() <= 128 &&
+             data.senderName is string && data.senderName.size() >= 1 && data.senderName.size() <= 80 &&
+             data.senderRole in ['STUDENT', 'INSTRUCTOR', 'ADMIN'] &&
+             data.courseCode is string && data.courseCode.size() >= 1 && data.courseCode.size() <= 20 &&
+             data.subject is string && data.subject.size() >= 1 && data.subject.size() <= 160 &&
+             data.body is string && data.body.size() >= 1 && data.body.size() <= 4000 &&
+             data.priority in ['CRITICAL', 'HIGH', 'NORMAL', 'LOW'] &&
+             data.answered is bool &&
+             (!('replyText' in data) || (data.replyText is string && data.replyText.size() <= 4000)) &&
+             (!('aiSummary' in data) || (data.aiSummary is string && data.aiSummary.size() <= 1000)) &&
+             (!('extractedDeadline' in data) || (data.extractedDeadline is string && data.extractedDeadline.size() <= 80)) &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    function isValidCalendarEvent(data) {
+      return data.userId is string && data.userId.size() >= 1 && data.userId.size() <= 128 &&
+             data.title is string && data.title.size() >= 1 && data.title.size() <= 120 &&
+             data.courseCode is string && data.courseCode.size() <= 20 &&
+             data.eventType in ['LECTURE', 'QUIZ', 'ASSIGNMENT', 'MIDTERM', 'FINAL', 'OFFICE_HOUR', 'ALARM'] &&
+             data.triggerEpochMillis is int && data.triggerEpochMillis > 0 &&
+             data.alarmEnabled is bool &&
+             data.ringtoneId is string && data.ringtoneId.size() >= 1 && data.ringtoneId.size() <= 40 &&
+             data.volumePercent is int && data.volumePercent >= 0 && data.volumePercent <= 100 &&
+             data.notes is string && data.notes.size() <= 500 &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    function isValidPersonalMaterial(data) {
+      return data.userId is string && data.userId.size() >= 1 && data.userId.size() <= 128 &&
+             data.title is string && data.title.size() >= 1 && data.title.size() <= 120 &&
+             data.noteContent is string && data.noteContent.size() <= 5000 &&
+             data.fileUri is string && data.fileUri.size() <= 500 &&
+             data.fileName is string && data.fileName.size() <= 160 &&
+             data.materialType in ['NOTE', 'FILE', 'LINK'] &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    function isValidCourseMaterial(data) {
+      return data.authorUid is string && data.authorUid.size() >= 1 && data.authorUid.size() <= 128 &&
+             data.authorName is string && data.authorName.size() >= 1 && data.authorName.size() <= 80 &&
+             data.courseCode is string && data.courseCode.size() >= 1 && data.courseCode.size() <= 20 &&
+             data.title is string && data.title.size() >= 1 && data.title.size() <= 140 &&
+             data.description is string && data.description.size() <= 1000 &&
+             data.linkUrl is string && data.linkUrl.size() <= 500 &&
+             data.fileName is string && data.fileName.size() <= 160 &&
+             data.materialKind in ['LECTURE_SLIDES', 'ONLINE_LINK', 'RECORDING', 'ASSIGNMENT_BRIEF'] &&
+             data.scope == 'AOU' &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    function isValidForumPost(data) {
+      return data.authorUid is string && data.authorUid.size() >= 1 && data.authorUid.size() <= 128 &&
+             data.authorName is string && data.authorName.size() >= 1 && data.authorName.size() <= 80 &&
+             data.category is string && data.category.size() >= 1 && data.category.size() <= 40 &&
+             data.questionTitle is string && data.questionTitle.size() >= 1 && data.questionTitle.size() <= 160 &&
+             data.questionBody is string && data.questionBody.size() >= 1 && data.questionBody.size() <= 2000 &&
+             data.repliesCount is int && data.repliesCount >= 0 && data.repliesCount <= 1000 &&
+             data.latestReply is string && data.latestReply.size() <= 1000 &&
+             data.scope == 'AOU' &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    function isValidDirectChatMessage(data) {
+      return data.userId is string && data.userId.size() >= 1 && data.userId.size() <= 128 &&
+             data.peerName is string && data.peerName.size() >= 1 && data.peerName.size() <= 80 &&
+             data.peerRole in ['STUDENT', 'INSTRUCTOR'] &&
+             data.senderIsSelf is bool &&
+             data.messageText is string && data.messageText.size() <= 2000 &&
+             data.imageUri is string && data.imageUri.size() <= 500 &&
+             data.courseCode is string && data.courseCode.size() <= 20 &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    function isValidGeneralChatMessage(data) {
+      return data.authorUid is string && data.authorUid.size() >= 1 && data.authorUid.size() <= 128 &&
+             data.authorName is string && data.authorName.size() >= 1 && data.authorName.size() <= 80 &&
+             data.authorBranch is string && data.authorBranch.size() >= 1 && data.authorBranch.size() <= 60 &&
+             data.courseTag is string && data.courseTag.size() >= 1 && data.courseTag.size() <= 30 &&
+             data.messageText is string && data.messageText.size() >= 1 && data.messageText.size() <= 2000 &&
+             data.scope == 'AOU' &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    // 1. User Profile & Subcollections
+    match /users/{userId} {
+      allow get: if isOwner(userId) && isValidId(userId);
+      allow list: if false;
+
+      allow create: if isOwner(userId) &&
+                       isValidId(userId) &&
+                       incoming().userId == request.auth.uid &&
+                       incoming().keys().hasAll(['userId', 'displayName', 'role', 'aouBranch', 'majorId', 'preferredLanguage', 'darkMode', 'pomodoroCharacter', 'createdAt', 'updatedAt']) &&
+                       incoming().keys().hasOnly(['userId', 'displayName', 'role', 'aouBranch', 'majorId', 'preferredLanguage', 'darkMode', 'pomodoroCharacter', 'createdAt', 'updatedAt']) &&
+                       isValidUserProfile(incoming());
+
+      allow update: if isOwner(userId) &&
+                       isValidId(userId) &&
+                       isValidUserProfile(incoming()) &&
+                       incoming().userId == existing().userId &&
+                       incoming().createdAt == existing().createdAt &&
+                       incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'role', 'aouBranch', 'majorId', 'preferredLanguage', 'darkMode', 'pomodoroCharacter', 'updatedAt']);
+
+      allow delete: if isOwner(userId) && isValidId(userId);
+
+      // 2. Inbox Emails
+      match /inbox/{emailId} {
+        allow get: if isOwner(userId) && isValidId(emailId);
+        allow list: if isOwner(userId);
+
+        allow create: if isOwner(userId) &&
+                         isValidId(emailId) &&
+                         incoming().userId == request.auth.uid &&
+                         incoming().keys().hasAll(['userId', 'senderName', 'senderRole', 'courseCode', 'subject', 'body', 'priority', 'answered', 'createdAt', 'updatedAt']) &&
+                         incoming().keys().hasOnly(['userId', 'senderName', 'senderRole', 'courseCode', 'subject', 'body', 'priority', 'answered', 'replyText', 'aiSummary', 'extractedDeadline', 'createdAt', 'updatedAt']) &&
+                         isValidInboxEmail(incoming());
+
+        allow update: if isOwner(userId) &&
+                         isValidId(emailId) &&
+                         isValidInboxEmail(incoming()) &&
+                         incoming().userId == existing().userId &&
+                         incoming().createdAt == existing().createdAt &&
+                         (
+                           incoming().diff(existing()).affectedKeys().hasOnly(['answered', 'replyText', 'updatedAt']) ||
+                           incoming().diff(existing()).affectedKeys().hasOnly(['aiSummary', 'extractedDeadline', 'updatedAt']) ||
+                           incoming().diff(existing()).affectedKeys().hasOnly(['priority', 'updatedAt'])
+                         );
+
+        allow delete: if isOwner(userId) && isValidId(emailId);
+      }
+
+      // 3. Calendar Events & Smart Alarms
+      match /calendar_events/{eventId} {
+        allow get: if isOwner(userId) && isValidId(eventId);
+        allow list: if isOwner(userId);
+
+        allow create: if isOwner(userId) &&
+                         isValidId(eventId) &&
+                         incoming().userId == request.auth.uid &&
+                         incoming().keys().hasAll(['userId', 'title', 'courseCode', 'eventType', 'triggerEpochMillis', 'alarmEnabled', 'ringtoneId', 'volumePercent', 'notes', 'createdAt', 'updatedAt']) &&
+                         incoming().keys().hasOnly(['userId', 'title', 'courseCode', 'eventType', 'triggerEpochMillis', 'alarmEnabled', 'ringtoneId', 'volumePercent', 'notes', 'createdAt', 'updatedAt']) &&
+                         isValidCalendarEvent(incoming());
+
+        allow update: if isOwner(userId) &&
+                         isValidId(eventId) &&
+                         isValidCalendarEvent(incoming()) &&
+                         incoming().userId == existing().userId &&
+                         incoming().createdAt == existing().createdAt &&
+                         incoming().diff(existing()).affectedKeys().hasOnly(['title', 'courseCode', 'eventType', 'triggerEpochMillis', 'alarmEnabled', 'ringtoneId', 'volumePercent', 'notes', 'updatedAt']);
+
+        allow delete: if isOwner(userId) && isValidId(eventId);
+      }
+
+      // 4. Student Manual-Only Personal Materials & Notes
+      match /personal_materials/{materialId} {
+        allow get: if isOwner(userId) && isValidId(materialId);
+        allow list: if isOwner(userId);
+
+        allow create: if isOwner(userId) &&
+                         isValidId(materialId) &&
+                         incoming().userId == request.auth.uid &&
+                         incoming().keys().hasAll(['userId', 'title', 'noteContent', 'fileUri', 'fileName', 'materialType', 'createdAt', 'updatedAt']) &&
+                         incoming().keys().hasOnly(['userId', 'title', 'noteContent', 'fileUri', 'fileName', 'materialType', 'createdAt', 'updatedAt']) &&
+                         isValidPersonalMaterial(incoming());
+
+        allow update: if isOwner(userId) &&
+                         isValidId(materialId) &&
+                         isValidPersonalMaterial(incoming()) &&
+                         incoming().userId == existing().userId &&
+                         incoming().createdAt == existing().createdAt &&
+                         incoming().diff(existing()).affectedKeys().hasOnly(['title', 'noteContent', 'fileUri', 'fileName', 'materialType', 'updatedAt']);
+
+        allow delete: if isOwner(userId) && isValidId(materialId);
+      }
+
+      // 5. Private Direct Academic Chat
+      match /direct_chats/{messageId} {
+        allow get: if isOwner(userId) && isValidId(messageId);
+        allow list: if isOwner(userId);
+
+        allow create: if isOwner(userId) &&
+                         isValidId(messageId) &&
+                         incoming().userId == request.auth.uid &&
+                         incoming().keys().hasAll(['userId', 'peerName', 'peerRole', 'senderIsSelf', 'messageText', 'imageUri', 'courseCode', 'createdAt', 'updatedAt']) &&
+                         incoming().keys().hasOnly(['userId', 'peerName', 'peerRole', 'senderIsSelf', 'messageText', 'imageUri', 'courseCode', 'createdAt', 'updatedAt']) &&
+                         isValidDirectChatMessage(incoming());
+
+        allow update: if false;
+        allow delete: if isOwner(userId) && isValidId(messageId);
+      }
+    }
+
+    // 6. Instructor Published Course Materials (no PII; readable by signed-in academic users, writable only by author)
+    match /course_materials/{materialId} {
+      allow get: if isSignedIn() && isValidId(materialId);
+      allow list: if isSignedIn() && resource.data.scope == 'AOU';
+
+      allow create: if isSignedIn() &&
+                       isValidId(materialId) &&
+                       incoming().authorUid == request.auth.uid &&
+                       incoming().keys().hasAll(['authorUid', 'authorName', 'courseCode', 'title', 'description', 'linkUrl', 'fileName', 'materialKind', 'scope', 'createdAt', 'updatedAt']) &&
+                       incoming().keys().hasOnly(['authorUid', 'authorName', 'courseCode', 'title', 'description', 'linkUrl', 'fileName', 'materialKind', 'scope', 'createdAt', 'updatedAt']) &&
+                       isValidCourseMaterial(incoming());
+
+      allow update: if isSignedIn() &&
+                       isValidId(materialId) &&
+                       existing().authorUid == request.auth.uid &&
+                       incoming().authorUid == existing().authorUid &&
+                       incoming().scope == existing().scope &&
+                       incoming().createdAt == existing().createdAt &&
+                       isValidCourseMaterial(incoming()) &&
+                       incoming().diff(existing()).affectedKeys().hasOnly(['courseCode', 'title', 'description', 'linkUrl', 'fileName', 'materialKind', 'updatedAt']);
+
+      allow delete: if isSignedIn() && isValidId(materialId) && existing().authorUid == request.auth.uid;
+    }
+
+    // 7. Freshmen Q&A Forum (no PII; readable by signed-in users)
+    match /forum_posts/{postId} {
+      allow get: if isSignedIn() && isValidId(postId);
+      allow list: if isSignedIn() && resource.data.scope == 'AOU';
+
+      allow create: if isSignedIn() &&
+                       isValidId(postId) &&
+                       incoming().authorUid == request.auth.uid &&
+                       incoming().keys().hasAll(['authorUid', 'authorName', 'category', 'questionTitle', 'questionBody', 'repliesCount', 'latestReply', 'scope', 'createdAt', 'updatedAt']) &&
+                       incoming().keys().hasOnly(['authorUid', 'authorName', 'category', 'questionTitle', 'questionBody', 'repliesCount', 'latestReply', 'scope', 'createdAt', 'updatedAt']) &&
+                       isValidForumPost(incoming());
+
+      allow update: if isSignedIn() &&
+                       isValidId(postId) &&
+                       isValidForumPost(incoming()) &&
+                       incoming().authorUid == existing().authorUid &&
+                       incoming().scope == existing().scope &&
+                       incoming().createdAt == existing().createdAt &&
+                       (
+                         (existing().authorUid == request.auth.uid &&
+                          incoming().diff(existing()).affectedKeys().hasOnly(['category', 'questionTitle', 'questionBody', 'repliesCount', 'latestReply', 'updatedAt'])) ||
+                         incoming().diff(existing()).affectedKeys().hasOnly(['repliesCount', 'latestReply', 'updatedAt'])
+                       );
+
+      allow delete: if isSignedIn() && isValidId(postId) && existing().authorUid == request.auth.uid;
+    }
+
+    // 8. General Student Community Chat (shared AOU student channel)
+    match /general_student_chat/{messageId} {
+      allow get: if isSignedIn() && isValidId(messageId);
+      allow list: if isSignedIn() && resource.data.scope == 'AOU';
+
+      allow create: if isSignedIn() &&
+                       isValidId(messageId) &&
+                       incoming().authorUid == request.auth.uid &&
+                       incoming().keys().hasAll(['authorUid', 'authorName', 'authorBranch', 'courseTag', 'messageText', 'scope', 'createdAt', 'updatedAt']) &&
+                       incoming().keys().hasOnly(['authorUid', 'authorName', 'authorBranch', 'courseTag', 'messageText', 'scope', 'createdAt', 'updatedAt']) &&
+                       isValidGeneralChatMessage(incoming());
+
+      allow update: if false;
+      allow delete: if isSignedIn() && isValidId(messageId) && existing().authorUid == request.auth.uid;
+    }
+  }
+}

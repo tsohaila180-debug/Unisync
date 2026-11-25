@@ -1,0 +1,6 @@
+{
+  "name": "UniSync",
+  "description": "Academic management app for Arab Open University (AOU) students and instructors with role-separated workspaces, smart email triage, Pomodoro study companion, 10 AOU major roadmaps, and smart academic calendar.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

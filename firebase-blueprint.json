@@ -1,0 +1,182 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Authenticated UniSync AI user academic profile and workspace preferences.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Firebase Auth UID of the owner." },
+        "displayName": { "type": "string", "description": "Display name of the student or instructor." },
+        "role": { "type": "string", "enum": ["STUDENT", "INSTRUCTOR"], "description": "Academic workspace role." },
+        "aouBranch": { "type": "string", "description": "Arab Open University branch name." },
+        "majorId": { "type": "string", "description": "Selected AOU major identifier." },
+        "preferredLanguage": { "type": "string", "description": "ISO language code among 20 supported languages." },
+        "darkMode": { "type": "boolean", "description": "Dark mode UI preference." },
+        "pomodoroCharacter": { "type": "string", "enum": ["GIRL", "BOY"], "description": "Pomodoro study companion choice." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server creation timestamp." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server update timestamp." }
+      },
+      "required": ["userId", "displayName", "role", "aouBranch", "majorId", "preferredLanguage", "darkMode", "pomodoroCharacter", "createdAt", "updatedAt"]
+    },
+    "InboxEmail": {
+      "title": "InboxEmail",
+      "description": "Academic inbox message with priority, AI summary, and reply state.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "senderName": { "type": "string" },
+        "senderRole": { "type": "string", "enum": ["STUDENT", "INSTRUCTOR", "ADMIN"] },
+        "courseCode": { "type": "string" },
+        "subject": { "type": "string" },
+        "body": { "type": "string" },
+        "priority": { "type": "string", "enum": ["CRITICAL", "HIGH", "NORMAL", "LOW"] },
+        "answered": { "type": "boolean" },
+        "replyText": { "type": "string" },
+        "aiSummary": { "type": "string" },
+        "extractedDeadline": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "senderName", "senderRole", "courseCode", "subject", "body", "priority", "answered", "createdAt", "updatedAt"]
+    },
+    "CalendarEvent": {
+      "title": "CalendarEvent",
+      "description": "Academic deadline, lecture schedule, or smart alarm entry.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "courseCode": { "type": "string" },
+        "eventType": { "type": "string", "enum": ["LECTURE", "QUIZ", "ASSIGNMENT", "MIDTERM", "FINAL", "OFFICE_HOUR", "ALARM"] },
+        "triggerEpochMillis": { "type": "integer" },
+        "alarmEnabled": { "type": "boolean" },
+        "ringtoneId": { "type": "string" },
+        "volumePercent": { "type": "integer" },
+        "notes": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "title", "courseCode", "eventType", "triggerEpochMillis", "alarmEnabled", "ringtoneId", "volumePercent", "notes", "createdAt", "updatedAt"]
+    },
+    "PersonalMaterial": {
+      "title": "PersonalMaterial",
+      "description": "Student manual-only personal study note or uploaded file reference.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "noteContent": { "type": "string" },
+        "fileUri": { "type": "string" },
+        "fileName": { "type": "string" },
+        "materialType": { "type": "string", "enum": ["NOTE", "FILE", "LINK"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "title", "noteContent", "fileUri", "fileName", "materialType", "createdAt", "updatedAt"]
+    },
+    "CourseMaterial": {
+      "title": "CourseMaterial",
+      "description": "Instructor-published lecture material or online link.",
+      "type": "object",
+      "properties": {
+        "authorUid": { "type": "string" },
+        "authorName": { "type": "string" },
+        "courseCode": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "linkUrl": { "type": "string" },
+        "fileName": { "type": "string" },
+        "materialKind": { "type": "string", "enum": ["LECTURE_SLIDES", "ONLINE_LINK", "RECORDING", "ASSIGNMENT_BRIEF"] },
+        "scope": { "type": "string", "enum": ["AOU"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["authorUid", "authorName", "courseCode", "title", "description", "linkUrl", "fileName", "materialKind", "scope", "createdAt", "updatedAt"]
+    },
+    "ForumPost": {
+      "title": "ForumPost",
+      "description": "Freshmen Q&A academic forum thread.",
+      "type": "object",
+      "properties": {
+        "authorUid": { "type": "string" },
+        "authorName": { "type": "string" },
+        "category": { "type": "string" },
+        "questionTitle": { "type": "string" },
+        "questionBody": { "type": "string" },
+        "repliesCount": { "type": "integer" },
+        "latestReply": { "type": "string" },
+        "scope": { "type": "string", "enum": ["AOU"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["authorUid", "authorName", "category", "questionTitle", "questionBody", "repliesCount", "latestReply", "scope", "createdAt", "updatedAt"]
+    },
+    "DirectChatMessage": {
+      "title": "DirectChatMessage",
+      "description": "Private student-instructor academic message without personal phone numbers.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "peerName": { "type": "string" },
+        "peerRole": { "type": "string", "enum": ["STUDENT", "INSTRUCTOR"] },
+        "senderIsSelf": { "type": "boolean" },
+        "messageText": { "type": "string" },
+        "imageUri": { "type": "string" },
+        "courseCode": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "peerName", "peerRole", "senderIsSelf", "messageText", "imageUri", "courseCode", "createdAt", "updatedAt"]
+    },
+    "GeneralChatMessage": {
+      "title": "GeneralChatMessage",
+      "description": "Shared AOU General Student Community Chat message.",
+      "type": "object",
+      "properties": {
+        "authorUid": { "type": "string" },
+        "authorName": { "type": "string" },
+        "authorBranch": { "type": "string" },
+        "courseTag": { "type": "string" },
+        "messageText": { "type": "string" },
+        "scope": { "type": "string", "enum": ["AOU"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["authorUid", "authorName", "authorBranch", "courseTag", "messageText", "scope", "createdAt", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Private user profile and preferences scoped to authenticated userId."
+    },
+    "/users/{userId}/inbox/{emailId}": {
+      "schema": { "$ref": "#/entities/InboxEmail" },
+      "description": "User academic inbox messages scoped to authenticated userId."
+    },
+    "/users/{userId}/calendar_events/{eventId}": {
+      "schema": { "$ref": "#/entities/CalendarEvent" },
+      "description": "User calendar events and smart alarms scoped to authenticated userId."
+    },
+    "/users/{userId}/personal_materials/{materialId}": {
+      "schema": { "$ref": "#/entities/PersonalMaterial" },
+      "description": "Student manual-only personal study notes and files scoped to userId."
+    },
+    "/course_materials/{materialId}": {
+      "schema": { "$ref": "#/entities/CourseMaterial" },
+      "description": "Instructor-published lecture materials and online links."
+    },
+    "/forum_posts/{postId}": {
+      "schema": { "$ref": "#/entities/ForumPost" },
+      "description": "Freshmen Q&A forum threads."
+    },
+    "/general_student_chat/{messageId}": {
+      "schema": { "$ref": "#/entities/GeneralChatMessage" },
+      "description": "Shared General Student Community Chat messages scoped to AOU."
+    },
+    "/users/{userId}/direct_chats/{messageId}": {
+      "schema": { "$ref": "#/entities/DirectChatMessage" },
+      "description": "Private direct academic chat messages scoped to userId."
+    }
+  }
+}
